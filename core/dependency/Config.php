@@ -13,21 +13,10 @@ class Config
         // always at first
         self::initSystemConfig();
         self::initStaticConfig();
-        self::initDynamicConfig();
+        var_dump(Application::getContext());
+        //self::initDynamicConfig();
     }
 
-    /**
-     * If certain configuration files are not desired to be tracked by the project version control,
-     * you can use this feature to set as needed.
-     * It is recommended to store some secret keys, account information,
-     * and other private data externally, rather than on the VCS.
-     * @return void
-     */
-    private static function initDynamicConfig() {
-        if (defined("DYNAMIC_CONFIG_PATH")) {
-            self::initConfigFromFile(DYNAMIC_CONFIG_PATH);
-        }
-    }
 
     /**
      * Necessary configurations for project operation, such as dependency package configurations,
@@ -36,12 +25,22 @@ class Config
      * Before configuring, please clarify your key value names to avoid conflicts with system reserved key values due to exceptions.
      * @return void
      */
+    /**
+     * If certain configuration files are not desired to be tracked by the project version control,
+     * you can use this feature to set as needed.
+     * It is recommended to store some secret keys, account information,
+     * and other private data externally, rather than on the VCS.
+     * @return void
+     */
     private static function initStaticConfig() {
-        if (defined("CONFIG_PATH")) {
-            $configPath = Env::rewritePathForUnix(CONFIG_PATH);
+        if (!empty(Application::getContext()->getConfigPath())) {
+            $configPath = Application::getContext()->getConfigPath();
         } else {
+            $configPath = Application::getContext()->getAppPath().DIRECTORY_SEPARATOR."config";
+            if (!is_dir($configPath)) {
+                return;
+            }
             Logger::warn("Gear framework's Config path not specified, loading default[project_path/config] configuration.");
-            $configPath = self::getDefaultConfigPath();
         }
         self::initConfigFromFile($configPath);
     }
@@ -53,7 +52,7 @@ class Config
      * @return void
      */
     private static function initSystemConfig() {
-        self::initConfigFromFile(Application::getContext()->getConfigPath());
+        self::initConfigFromFile(Application::getContext()->getDefaultConfigPath());
     }
 
     private static function initConfigFromFile($configPath) {
@@ -70,28 +69,6 @@ class Config
                 self::setFromFile($key, $decodedObj);
             }
         }
-    }
-
-    /**
-     * 默认的配置包位置
-     * @return string
-     */
-    private static function getDefaultConfigPath() {
-        DBC::assertTrue(defined("PROJECT_PATH"),
-            "[Config] The specified path <".PROJECT_PATH."> for PROJECT_PATH does not exist. Please ensure that the path is correct and try again.",
-            0, GearShutDownException::class);
-        return PROJECT_PATH.DIRECTORY_SEPARATOR."config";
-    }
-
-    /**
-     * 默认的配置包位置
-     * @return string
-     */
-    private static function getGearConfigPath() {
-        DBC::assertTrue(defined("GEAR_PATH"),
-            "[Config] The specified path <".GEAR_PATH."> for GEAR_PATH does not exist. Please ensure that the path is correct and try again.",
-            0, GearShutDownException::class);
-        return GEAR_PATH.DIRECTORY_SEPARATOR."config";
     }
 
     private static function setFromFile($key, $data) {
