@@ -1,0 +1,13 @@
+{
+  "LOCAL": {
+  },
+  "DEV": {
+    "mydevmanual": "centos",
+    "@all": "centos"
+  },
+  "TEST": {
+    "@all": "gh"
+  },
+  "PROD": {
+  }
+}
