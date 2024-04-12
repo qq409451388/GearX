@@ -17,12 +17,12 @@ class DynamicProxy
      */
     private $ref;
     /**
-     * @var array<string, array<RuntimeItem>>
+     * @var array<string, array<RunTimeFunction>>
      */
     private $callBefore;
 
     /**
-     * @var array<string, array<RuntimeItem>>
+     * @var array<string, array<RunTimeFunction>>
      */
     private $callAfter;
 
@@ -96,7 +96,7 @@ class DynamicProxy
         if (!isset($this->callBefore[$targetFunc])) {
             $this->callBefore[$targetFunc] = [];
         }
-        $this->callBefore[$targetFunc][] = RuntimeItem::create($targetFunc, $anonyId, $anony, $order, $after);
+        $this->callBefore[$targetFunc][] = RunTimeFunction::create($targetFunc, $anonyId, $anony, $order, $after);
         $this->__CALL__reOrder($this->callAfter);
     }
 
@@ -104,7 +104,7 @@ class DynamicProxy
         if (!isset($this->callAfter[$targetFunc])) {
             $this->callAfter[$targetFunc] = [];
         }
-        $this->callAfter[$targetFunc][] = RuntimeItem::create($targetFunc, $anonyId, $anony, $order, $after);
+        $this->callAfter[$targetFunc][] = RunTimeFunction::create($targetFunc, $anonyId, $anony, $order, $after);
         $this->__CALL__reOrder($this->callAfter);
     }
 

@@ -1,5 +1,5 @@
 <?php
-class RuntimeItem implements EzDataObject
+class RunTimeFunction implements EzDataObject
 {
     /**
      * @var string 匿名函数ID
@@ -23,7 +23,7 @@ class RuntimeItem implements EzDataObject
 
     public $after;
 
-    public static function create($bindFuncName, $anonymousId, $anonymous, $order = 0, array $after = null):RuntimeItem {
+    public static function create($bindFuncName, $anonymousId, $anonymous, $order = 0, array $after = null):RunTimeFunction {
         $item = new static();
         $item->bindFuncName = $bindFuncName;
         $item->anonymousId = $anonymousId;
