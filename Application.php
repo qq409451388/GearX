@@ -19,7 +19,9 @@ class Application
      * @param ApplicationContext|null $context
      */
     public function __construct($context) {
-        if (!$context instanceof ApplicationContext) {
+        if (is_array($context)) {
+            $context = new ApplicationContext($context);
+        } else if (!$context instanceof ApplicationContext) {
             $context = new ApplicationContext();
         }
         Application::$context = $context;
@@ -36,29 +38,55 @@ class Application
         $this->rewritePath();
     }
 
-    public function rewritePath() {
+    /**
+     * Rewrite file path to support both Windows format (C:\xxx\xxx) and Unix format (/xxx/xxx or ~/xxx).
+     * When a folder name is passed in, treat the project path as the root path.
+     * @return void
+     */
+    private function rewritePath() {
         // rewrite path if $v is only a folder name
         foreach (Application::$context->getPaths() as $k => $v) {
             if (empty($v)) {
                 continue;
             }
-            if (self::isWin()) {
-                // rewrite path for windows
-                if (false === strpos($v, "/")) {
-                    $v = Application::$context->getAppPath() . DIRECTORY_SEPARATOR . $v;
-                }
-            } else {
-                if (false === strpos($v, DIRECTORY_SEPARATOR)) {
-                    $v = Application::$context->getAppPath() . DIRECTORY_SEPARATOR . $v;
-                }
-            }
-            $v = self::rewritePathForUnix($v);
+
             if (!is_dir($v)) {
-                exit("The $k <$v> is not exists!");
+                if (!self::isPlainFolderName($v)) {
+                    exit("The $k <$v> is not a folder name!");
+                }
+                // treat the project path as the root path.
+                if (self::isWin()) {
+                    // rewrite path for windows
+                    if (false === strpos($v, "/")) {
+                        $v = Application::$context->getAppPath() . DIRECTORY_SEPARATOR . $v;
+                    }
+                } else {
+                    if (false === strpos($v, DIRECTORY_SEPARATOR)) {
+                        $v = Application::$context->getAppPath() . DIRECTORY_SEPARATOR . $v;
+                    }
+                }
+                $v = self::rewritePathForUnix($v);
+                if (!is_dir($v)) {
+                    exit("The $k <$v> is not exists!");
+                }
+                $func = "set" . ucfirst($k);
+                Application::$context->$func($v);
             }
-            $func = "set" . ucfirst($k);
-            Application::$context->$func($v);
         }
+    }
+
+    private static function isPlainFolderName($folderName) {
+        // 根据不同操作系统设置不同的正则表达式
+        if (self::isWin()) {
+            // Windows 文件夹名称不能包含 \/:*?"<>| 以及控制字符
+            $pattern = '/^[^\/\\\\:*?"<>|\x00-\x1F]+$/';
+        } else {
+            // Unix-like (Linux, macOS) 文件夹名称不能包含 / 以及控制字符
+            $pattern = '/^[^\/\x00-\x1F]+$/';
+        }
+
+        // 使用 preg_match 检查是否匹配
+        return preg_match($pattern, $folderName) === 1;
     }
 
     /**
@@ -86,7 +114,8 @@ class Application
     protected function loadCore() {
         $hash = $this->getFilePaths(Application::$context->getCorePath());
         $this->register($hash);
-        Application::$context->setGlobalCoreClass(array_keys($hash));
+        $classes = array_keys($hash);
+        Application::$context->setGlobalCoreClass($classes);
     }
 
     // todo 类加载 区分场景，http、tcp等
@@ -99,28 +128,35 @@ class Application
         Config::set(["GLOBAL_USER_CLASS"=>array_keys($hash)]);
     }
 
-    protected function initConfig() {
-        Config::init();
-    }
-
     protected function loadModulePackages() {
-        $dependencies = Config::get("dependency");
+        $dependencies = Config::get("application.dependency");
         if (is_null($dependencies)) {
             return;
         }
-        $this->loadModules($dependencies);
-    }
-
-    public function loadModules(array $modules) {
         $packages = Config::get("package");
-        $dependencies = EzCollectionUtils::matchKeys($modules, $packages);
-        $hash = SysUtils::searchModules($dependencies);
+        $dependencies = EzCollectionUtils::matchKeys($dependencies, $packages);
+        $hash = self::searchModules($dependencies);
         $this->register($hash);
+        $classes = [];
+        // regist Components
         foreach ($hash as $className => $classPath) {
             if (is_subclass_of($className, EzComponent::class)) {
-                Config::add("GLOBAL_COMPONENTS", $className);
+                $classes[] = $className;
             }
         }
+        Application::$context->setGlobalClass($classes);
+    }
+
+    private static function searchModules($dependencies) {
+        $classes = [];
+        $gearPath = Application::$context->getGearPath();
+        foreach ($dependencies as $dependency) {
+            foreach ($dependency as $d) {
+                $path = $gearPath.DIRECTORY_SEPARATOR.$d;
+                $classes += SysUtils::scanFile($path, -1, ["php"], true);
+            }
+        }
+        return $classes;
     }
 
     private function getFilePaths($path)
@@ -230,12 +266,13 @@ class Application
      * @param $applicationArguments
      * @return self
      */
-    public static function runScript(ApplicationContext $applicationArguments = null) {
+    public static function runScript($applicationArguments = null) {
         $app = new self($applicationArguments);
         $app->envConfiguration();
         $app->loadCore();
+        // for Logger
         Env::setRunModeScript();
-        $app->initConfig();
+        Config::init();
         $app->loadModulePackages();
         return $app;
     }
@@ -285,37 +322,104 @@ class Application
     }
 }
 
+/**
+ * collect php args
+ * such as :
+ * 1: normal -Pa=1
+ * 2: array  -PAb=1,2,3
+ * 3: object  -POc[a]=1 -POc[b]=2
+ */
 class ApplicationContext {
     private $appPath;
-    private $defaultConfigPath;
-    private $configPath;
     private $gearPath;
     private $corePath;
+    /**
+     * Gear-defined dependency-related configuration
+     * default at [gearPath]/config
+     */
+    private $defaultConfigPath;
+    /**
+     * User-defined dependency-related configuration
+     * for instead of the <defaultConfigPath>
+     */
+    private $systemConfigPath;
+    /**
+     * User-defined parameter attribute configuration
+     * default at [appPath]/config is exists
+     */
+    private $configPath;
     private $globalCoreClass = [];
+    private $globalClass = [];
+    private $configuration = null;
+
+    public function __construct($args = []) {
+        foreach ($args as $arg) {
+            // 匹配 -PA<Key>=[<Value1>,<Value2>,...] 列表格式
+            if (preg_match('/^-PA(\w+)=\[(.*?)\]$/', $arg, $matches)) {
+                $k = $matches[1];
+                $v = $matches[2] !== '' ? explode(',', $matches[2]) : [];
+                if (empty($k) || empty($v)) {
+                    echo "[".date("Y-m-d H:i:s")."][WARN]Invalid argument $arg and ignored.".PHP_EOL;
+                    continue;
+                }
+                if (!property_exists($this, $k)) {
+                    echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument {$matches[2]} and ignored.".PHP_EOL;
+                    continue;
+                }
+                $this->$k = $v;
+            } else if (preg_match('/^-PO(\w+)\[(\w+)\]=(.*)$/', $arg, $matches)) {
+                // 匹配 -PO<Key>[<SubKey>]=<Value> 嵌套数组格式
+                $k = $matches[1];
+                $k2 = $matches[2];
+                $v = $matches[3];
+                if (empty($k) || empty($k2) || empty($v)) {
+                    echo "[".date("Y-m-d H:i:s")."][WARN]Invalid argument $arg and ignored.".PHP_EOL;
+                    continue;
+                }
+                if (!property_exists($this, $k)) {
+                    echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument $v and ignored.".PHP_EOL;
+                    continue;
+                }
+                if ($this->$k === null) {
+                    $this->$k = [];
+                }
+                $this->$k[$k2] = $v;
+            }else if (preg_match('/^-P(\w+)=(.*)/', $arg, $matches)) {
+                // 匹配 -P<Key>=<Value> 格式
+                $k = $matches[1];
+                $v = $matches[2];
+                if (empty($k) || empty($v)) {
+                    echo "[".date("Y-m-d H:i:s")."][WARN]Invalid argument $arg and ignored.".PHP_EOL;
+                    continue;
+                }
+                if (!property_exists($this, $k)) {
+                    echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument $v and ignored.".PHP_EOL;
+                    continue;
+                }
+                $this->$k = $v;
+            }
+        }
+    }
 
     public function build() {
         if (empty($this->appPath)) {
-            echo "[".date("Y-m-d H:i:s")."][WARN]App path not specified, loading default [project_path] configuration".PHP_EOL;
+            //echo "[".date("Y-m-d H:i:s")."][WARN]App path not specified, loading default [project_path] configuration".PHP_EOL;
             $this->appPath = dirname(__FILE__, 2);
         }
         if (empty($this->gearPath)) {
             echo "[".date("Y-m-d H:i:s")."][WARN]Gear framework path not specified, loading default [project_path/GearX] configuration".PHP_EOL;
-            $this->gearPath = $this->appPath."/GearX";
+            $this->setGearPath($this->appPath."/GearX");
+        } else {
+            $this->setGearPath($this->gearPath);
         }
-        $this->defaultConfigPath = $this->gearPath."/config";
     }
 
-    public function getGearPath(): string
-    {
-        return $this->gearPath;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getConfigPath()
-    {
-        return $this->configPath;
+    public function getPaths() {
+        return [
+            "configPath" => $this->configPath,
+            "gearPath" => $this->gearPath,
+            "corePath" => $this->corePath
+        ];
     }
 
     /**
@@ -326,30 +430,30 @@ class ApplicationContext {
         return $this->appPath;
     }
 
-    public function getPaths() {
-        return [
-            "configPath" => $this->configPath,
-            "gearPath" => $this->gearPath,
-            "corePath" => $this->gearPath."/core",
-        ];
-    }
-
-    public function setAppPath(string $appPath): void
+    /**
+     * @param mixed $appPath
+     */
+    public function setAppPath($appPath): void
     {
         $this->appPath = $appPath;
     }
 
     /**
-     * @param mixed $configPath
+     * @return mixed
      */
-    public function setConfigPath($configPath): void
+    public function getGearPath()
     {
-        $this->configPath = $configPath;
+        return $this->gearPath;
     }
 
-    public function setGearPath(string $gearPath): void
+    /**
+     * @param mixed $gearPath
+     */
+    public function setGearPath($gearPath): void
     {
         $this->gearPath = $gearPath;
+        $this->corePath = $gearPath."/core";
+        $this->defaultConfigPath = $gearPath."/config";
     }
 
     /**
@@ -361,11 +465,43 @@ class ApplicationContext {
     }
 
     /**
-     * @param mixed $corePath
+     * @return mixed
      */
-    public function setCorePath($corePath): void
+    public function getDefaultConfigPath()
     {
-        $this->corePath = $corePath;
+        return $this->defaultConfigPath;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSystemConfigPath()
+    {
+        return $this->systemConfigPath;
+    }
+
+    /**
+     * @param mixed $systemConfigPath
+     */
+    public function setSystemConfigPath($systemConfigPath): void
+    {
+        $this->systemConfigPath = $systemConfigPath;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConfigPath()
+    {
+        return $this->configPath;
+    }
+
+    /**
+     * @param mixed $configPath
+     */
+    public function setConfigPath($configPath): void
+    {
+        $this->configPath = $configPath;
     }
 
     public function getGlobalCoreClass(): array
@@ -378,12 +514,14 @@ class ApplicationContext {
         $this->globalCoreClass = $globalCoreClass;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDefaultConfigPath()
+    public function getGlobalClass(): array
     {
-        return $this->defaultConfigPath;
+        return $this->globalClass;
+    }
+
+    public function setGlobalClass(array $globalClass): void
+    {
+        $this->globalClass = $globalClass;
     }
 
 }

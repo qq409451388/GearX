@@ -112,17 +112,6 @@ class SysUtils
         return $result;
     }
 
-    public static function searchModules($dependencies) {
-        $classes = [];
-        foreach ($dependencies as $dependency) {
-            foreach ($dependency as $d) {
-                $path = GEAR_PATH.DIRECTORY_SEPARATOR.$d;
-                $classes += self::scanFile($path, -1, ["php"], true);
-            }
-        }
-        return $classes;
-    }
-
     public static function generateThreadId() {
         $id = uniqid();
         return md5(time()).'-'.$id;

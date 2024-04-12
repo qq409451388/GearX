@@ -13,8 +13,6 @@ class Config
         // always at first
         self::initSystemConfig();
         self::initStaticConfig();
-        var_dump(Application::getContext());
-        //self::initDynamicConfig();
     }
 
 
@@ -52,7 +50,10 @@ class Config
      * @return void
      */
     private static function initSystemConfig() {
-        self::initConfigFromFile(Application::getContext()->getDefaultConfigPath());
+        $systemConfigPath = empty(Application::getContext()->getSystemConfigPath()) ?
+            Application::getContext()->getDefaultConfigPath() :
+            Application::getContext()->getSystemConfigPath();
+        self::initConfigFromFile($systemConfigPath);
     }
 
     private static function initConfigFromFile($configPath) {
