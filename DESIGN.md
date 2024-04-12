@@ -28,6 +28,7 @@
   * Run Time Aspect
 * The Object Of Process Pointcut (RunTimeProcessPoint)
 * The Object Of Function For Aspect (RunTimeFunction)
+## dependency collect and check
 ## dependency injection
 * Bean Definition
 * Collection framework
@@ -42,3 +43,5 @@
   * Trace
   * Logger Collect
 # modules
+* dependency collect and check (package.info)
+* config collect and check

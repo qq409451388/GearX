@@ -131,9 +131,7 @@ class Application
         if (is_null($dependencies)) {
             return;
         }
-        $packages = Config::get("package");
-        $dependencies = EzCollectionUtils::matchKeys($dependencies, $packages);
-        $hash = self::searchModules($dependencies);
+        $hash = self::searchModules(EzBeanUtils::createObjectList($dependencies, DependencyInfo::class));
         $this->register($hash);
         $classes = [];
         // regist Components
@@ -145,14 +143,20 @@ class Application
         Application::$context->setGlobalComponentClass($classes);
     }
 
+    /**
+     * @param array<DependencyInfo> $dependencies
+     * @return array
+     */
     private static function searchModules($dependencies) {
+        $dependenciedNeedToImport = [];
         $classes = [];
-        $gearPath = Application::$context->getGearPath();
         foreach ($dependencies as $dependency) {
-            foreach ($dependency as $d) {
-                $path = $gearPath.DIRECTORY_SEPARATOR.$d;
-                $classes += SysUtils::scanFile($path, -1, ["php"], true);
+            //$dependenciedNeedToImport[$dependency] = null;
+            $subDependencies = DependencyCollector::analyse($dependency);
+            if (!empty($subDependencies)) {
+                self::searchModules($subDependencies);
             }
+            $classes += DependencyCollector::import($dependency);
         }
         return $classes;
     }

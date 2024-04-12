@@ -83,6 +83,16 @@ class EzBeanUtils implements EzHelper
         }
     }
 
+    public static function createObjectList($data, string $className) {
+        if (empty($data)) {
+            return $data;
+        }
+        foreach ($data as &$dateItem) {
+            $dateItem = self::createObject($dateItem, $className);
+        }
+        return $data;
+    }
+
     /**
      * @param $data
      * @param $className
@@ -156,7 +166,7 @@ class EzBeanUtils implements EzHelper
         $propertyReflections = $reflectionClass->getProperties();
         $hash = [];
         foreach ($propertyReflections as $propertyReflection) {
-            $annoItem = $propertyReflection->getAnnoation(Clazz::get(ColumnAlias::class));
+            $annoItem = $propertyReflection->getAnnoation(Clazz::get(JsonProperty::class));
             if ($annoItem instanceof AnnoItem) {
                 $hash[$annoItem->value] = $propertyReflection->getName();
             }
@@ -184,7 +194,7 @@ class EzBeanUtils implements EzHelper
         preg_match("/\s+@required\s*/", $doc, $matched);
         DBC::assertTrue(empty($matched) || isset($data), "[EzObject] Required Column $column Check Fail! Data Must Be Set!",
             0, GearIllegalArgumentException::class);
-        preg_match("/\*\s+@var\s+(?<propertyType>[a-zA-Z0-9\s<>,]+)(\r\n|\s+[\$][A-Za-z0-9]+\s*)/", $doc, $matched);
+        preg_match("/\*\s+@var\s+(?<propertyType>[a-zA-Z0-9\s<>,]+)(\r\n|\s+[\$][A-Za-z0-9]+\s*|\s*\*\/)/", $doc, $matched);
         $propertyTypeMatched = $matched['propertyType']??"";
         if (empty($propertyTypeMatched)) {
             return [null, null];
@@ -219,12 +229,15 @@ class EzBeanUtils implements EzHelper
         }
         // 3. LIST
         preg_match("/array<\s*(?<propertyType>\w+)\s*>/", $propertyTypeMatched, $matched);
+
         $propertyType = $matched['propertyType'] ?? "";
         if (!empty($propertyType)) {
             DBC::assertTrue(EzObjectUtils::isList($data), "[EzObject] Match data Fail! Type Must Be a Map, But ".gettype($data),
                 0, GearIllegalArgumentException::class);
-            foreach ($data as &$datum) {
-                $datum = EzObjectUtils::convertScalarToTrueType($datum, $propertyType);
+            if (EzObjectUtils::isScalarType($propertyType)) {;
+                foreach ($data as &$datum) {
+                    $datum = EzObjectUtils::convertScalarToTrueType($datum, $propertyType);
+                }
             }
             return ["LIST", $propertyType];
         }
