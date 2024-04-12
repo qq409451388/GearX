@@ -94,7 +94,7 @@ class Application
      * @param string $path
      * @return string
      */
-    public static function rewritePathForUnix($path) {
+    private static function rewritePathForUnix($path) {
         if (self::isUnix() && 0 === strpos($path, "~/")) {
             $home = self::getHome();
             return str_replace("~/", $home."/", $path);
@@ -120,12 +120,10 @@ class Application
 
     // todo 类加载 区分场景，http、tcp等
     protected function loadWebServerContainer() {
-        if (!defined("USER_PATH")) {
-            $this->setPath("USER_PATH", PROJECT_PATH."/src");
-        }
-        $hash = $this->getFilePaths(USER_PATH);
+        $hash = $this->getFilePaths(Application::$context->getAppSourceClassPath());
         $this->register($hash);
-        Config::set(["GLOBAL_USER_CLASS"=>array_keys($hash)]);
+        $classes = array_keys($hash);
+        Application::$context->setAppSourceClass($classes);
     }
 
     protected function loadModulePackages() {
@@ -144,7 +142,7 @@ class Application
                 $classes[] = $className;
             }
         }
-        Application::$context->setGlobalClass($classes);
+        Application::$context->setGlobalComponentClass($classes);
     }
 
     private static function searchModules($dependencies) {
@@ -159,8 +157,10 @@ class Application
         return $classes;
     }
 
-    private function getFilePaths($path)
-    {
+    private function getFilePaths($path) {
+        if (!is_dir($path)) {
+            exit("[error] The path $path is not exists!");
+        }
         $hash = [];
         //过滤掉点和点点
         $map = array_filter(scandir($path), function($var) {
@@ -266,7 +266,7 @@ class Application
      * @param $applicationArguments
      * @return self
      */
-    public static function runScript($applicationArguments = null) {
+    public static function loadScript($applicationArguments = null) {
         $app = new self($applicationArguments);
         $app->envConfiguration();
         $app->loadCore();
@@ -287,15 +287,12 @@ class Application
      * @param $constants
      * @return self
      */
-    public static function runWebServer(ApplicationContext $applicationArguments = null) {
-        if (is_null($applicationArguments)) {
-            $applicationArguments = new ApplicationContext();
-        }
-        $app = new self();
-        $app->envConstants($applicationArguments->getConstants());
+    public static function loadWebServer($applicationArguments = null) {
+        $app = new self($applicationArguments);
+        $app->envConfiguration();
         $app->loadCore();
         Env::setRunModeConsole();
-        $app->initConfig();
+        Config::init();
         $app->loadModulePackages();
         $app->loadWebServerContainer();
         return $app;
@@ -310,7 +307,7 @@ class Application
      * @param $constants
      * @return SchduleTaskApplication
      */
-    public static function runSchduleTask($constants = null) {
+    public static function loadSchduleTask($constants = null) {
         $app = new self();
         $app->envConstants($constants);
         $app->loadCore();
@@ -331,6 +328,7 @@ class Application
  */
 class ApplicationContext {
     private $appPath;
+    private $appSourceClassPath;
     private $gearPath;
     private $corePath;
     /**
@@ -349,7 +347,8 @@ class ApplicationContext {
      */
     private $configPath;
     private $globalCoreClass = [];
-    private $globalClass = [];
+    private $globalComponentClass = [];
+    private $appSourceClass = [];
     private $configuration = null;
 
     public function __construct($args = []) {
@@ -403,8 +402,14 @@ class ApplicationContext {
 
     public function build() {
         if (empty($this->appPath)) {
-            //echo "[".date("Y-m-d H:i:s")."][WARN]App path not specified, loading default [project_path] configuration".PHP_EOL;
             $this->appPath = dirname(__FILE__, 2);
+            if (is_dir($this->appPath) && is_dir($this->appPath."/src")) {
+                echo "[".date("Y-m-d H:i:s")."][WARN]App path not specified, loading default [project_path] configuration".PHP_EOL;
+            }
+        }
+        $this->appSourceClassPath = $this->appPath."/src";
+        if (!is_dir($this->appPath) || !is_dir($this->appSourceClassPath)) {
+            exit("[error]The appPath must be set at valid project <Root Path>!");
         }
         if (empty($this->gearPath)) {
             echo "[".date("Y-m-d H:i:s")."][WARN]Gear framework path not specified, loading default [project_path/GearX] configuration".PHP_EOL;
@@ -422,106 +427,77 @@ class ApplicationContext {
         ];
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAppPath()
-    {
+    public function getAppPath() {
         return $this->appPath;
     }
 
-    /**
-     * @param mixed $appPath
-     */
-    public function setAppPath($appPath): void
-    {
+    public function setAppPath($appPath): void {
         $this->appPath = $appPath;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getGearPath()
-    {
+    public function getGearPath() {
         return $this->gearPath;
     }
 
-    /**
-     * @param mixed $gearPath
-     */
-    public function setGearPath($gearPath): void
-    {
+    public function setGearPath($gearPath): void {
         $this->gearPath = $gearPath;
         $this->corePath = $gearPath."/core";
         $this->defaultConfigPath = $gearPath."/config";
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCorePath()
-    {
+    public function getCorePath() {
         return $this->corePath;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDefaultConfigPath()
-    {
+    public function getDefaultConfigPath() {
         return $this->defaultConfigPath;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSystemConfigPath()
-    {
+    public function getSystemConfigPath() {
         return $this->systemConfigPath;
     }
 
-    /**
-     * @param mixed $systemConfigPath
-     */
-    public function setSystemConfigPath($systemConfigPath): void
-    {
+    public function setSystemConfigPath($systemConfigPath): void {
         $this->systemConfigPath = $systemConfigPath;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getConfigPath()
-    {
+    public function getConfigPath() {
         return $this->configPath;
     }
 
-    /**
-     * @param mixed $configPath
-     */
-    public function setConfigPath($configPath): void
-    {
+    public function setConfigPath($configPath): void {
         $this->configPath = $configPath;
     }
 
-    public function getGlobalCoreClass(): array
-    {
+    public function getGlobalCoreClass(): array {
         return $this->globalCoreClass;
     }
 
-    public function setGlobalCoreClass(array $globalCoreClass): void
-    {
+    public function setGlobalCoreClass(array $globalCoreClass): void {
         $this->globalCoreClass = $globalCoreClass;
     }
 
-    public function getGlobalClass(): array
-    {
-        return $this->globalClass;
+    public function getGlobalComponentClass(): array {
+        return $this->globalComponentClass;
     }
 
-    public function setGlobalClass(array $globalClass): void
-    {
-        $this->globalClass = $globalClass;
+    public function setGlobalComponentClass(array $globalClass): void {
+        $this->globalComponentClass = $globalClass;
     }
 
+    public function getAppSourceClassPath() {
+        return $this->appSourceClassPath;
+    }
+
+    public function setAppSourceClassPath($appSourceClassPath): void {
+        $this->appSourceClassPath = $appSourceClassPath;
+    }
+
+    public function getAppSourceClass() {
+        return $this->appSourceClass;
+    }
+
+    public function setAppSourceClass($appSourceClass): void {
+        $this->appSourceClass = $appSourceClass;
+    }
 }

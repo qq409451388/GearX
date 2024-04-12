@@ -1,6 +1,6 @@
 <?php
 
-abstract class AbstractDO implements EzDataObject, EzIgnoreUnknow, EzComponent
+abstract class AbstractDO implements EzDataObject, EzIgnoreUnknow
 {
     public function __construct() {
     }
