@@ -81,6 +81,6 @@ class EzTreeNode implements EzDataObject
     }
 
     public function toString() {
-        return EzObjectUtils::toString($this->data);
+        return EzDataUtils::toString($this->data);
     }
 }

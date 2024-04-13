@@ -23,208 +23,202 @@ class EzObjectUtils
         return $hashCode;
     }
 
-    public static function argsCheck(...$args)
-    {
-        foreach ($args as $arg) {
-            if (empty($arg) || (is_numeric($arg) && 0 > $arg)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static function isJson($obj)
-    {
-        if (!is_string($obj)) {
-            return false;
-        }
-        return self::isArray(EzCollectionUtils::decodeJson($obj));
-    }
-
-    public static function isArray($obj)
-    {
-        return is_array($obj);
-    }
-
-    public static function isString($obj) {
-        return is_string($obj);
-    }
-
-    public static function toString($obj)
-    {
-        if (is_string($obj) || is_numeric($obj)) {
-            return (string)$obj;
-        } else {
-            if ($obj instanceof EzDataObject) {
-                return json_encode(get_mangled_object_vars($obj));
-            } elseif (is_array($obj) || is_object($obj)) {
-                return json_encode($obj);
-            } elseif (is_resource($obj)) {
-                return "[Resource]#" . ((int)$obj);
-            } else {
-                return "null";
-            }
-        }
-    }
-
-    public static function isList($array)
-    {
-        if (!self::isArray($array)) {
-            return false;
-        }
-        $i = 0;
-        foreach ($array as $k => $v) {
-            if ($k !== $i++) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static function isMap($array) {
-        return is_array($array) && !self::isList($array);
-    }
-
     /**
-     * 是否是一个Map
-     * @param $array
-     * @return bool
+     * @param array|null $data
+     * @param string $className
+     * @return BaseDTO|EzIgnoreUnknow|object|null
+     * @throws Exception
      */
-    public static function isMapAdvance($array, $keyTypeExpect, $valueTypeExpect)
-    {
-        $isNotList = is_array($array) && !self::isList($array);
-        if (!$isNotList) {
-            return false;
-        }
-        foreach ($array as $k => $v) {
-            $keyType = gettype($k);
-            DBC::assertTrue(
-                EzObjectUtils::dataTypeNameEquals($keyType, $keyTypeExpect),
-                "[EzObject] Match data Fail! The Map Key " . EzObjectUtils::toString(
-                    $k
-                ) . " Must Be Type Of $keyTypeExpect, But " . $keyType,
-                0,
-                GearIllegalArgumentException::class
-            );
-            $valueType = gettype($v);
-            DBC::assertTrue(
-                EzObjectUtils::dataTypeNameEquals($valueType, $valueTypeExpect),
-                "[EzObject] Match data Fail! The Map Value " . EzObjectUtils::toString(
-                    $v
-                ) . " Must Be Type Of $valueTypeExpect, But " . $valueType,
-                0,
-                GearIllegalArgumentException::class
-            );
-        }
-        return true;
-    }
-
-    public static function isAllNotNull(...$obj) {
-        foreach ($obj as $o) {
-            if (is_null($o)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static function isFalse($obj) {
-        if (!is_bool($obj)) {
-            Logger::warn("[EzObjectUtils] method isFalse expect params is a boolean! but send:{}", self::toString($obj));
-            return false;
-        }
-        return !$obj;
-    }
-
-    private static $dataTypeMap = [
-        "int" => "Integer",
-        "integer" => "Integer",
-        "float" => "Double",
-        "double" => "Double",
-        "string" => "String",
-        "array" => "Array",
-        "resource" => "Resource"
-    ];
-
-    private static $scalarTypeList = [
-        "Integer",
-        "Double",
-        "String"
-    ];
-
-    public static function isScalar($data)
-    {
+    public static function createObject($data, string $className) {
         if (is_null($data)) {
-            return true;
-        }
-        return is_scalar($data);
-    }
-
-    public static function isScalarType($dataType)
-    {
-        return in_array($dataType, self::$scalarTypeList)
-            || in_array(self::$dataTypeMap[$dataType] ?? "", self::$scalarTypeList);
-    }
-
-    public static function dataTypeNameEquals($actual, $expect)
-    {
-        if ($actual === $expect) {
-            return true;
-        }
-        if (is_null($expect) || is_null($actual)) {
-            return false;
-        }
-        $actual = strtolower($actual);
-        $expect = strtolower($expect);
-        if ($actual === $expect) {
-            return true;
-        }
-        $actualTrans = self::$dataTypeMap[$actual] ?? null;
-        $expectTrans = self::$dataTypeMap[$expect] ?? null;
-        return $actualTrans === $expectTrans;
-    }
-
-    /**
-     * 标量转换真实类型
-     * @param $data
-     * @param string $dataType
-     * @return mixed
-     */
-    public static function convertScalarToTrueType($data, string $dataType = null) {
-        if (in_array($dataType, ["int", "integer", "Integer"])) {
-            return intval($data);
-        }
-        if (in_array($dataType, ["float", "Float"])) {
-            return floatval($data);
-        }
-        if (in_array($dataType, ["double", "Double"])) {
-            return doubleval($data);
-        }
-        return strval($data);
-    }
-
-    public static function getFromObject($object, $key) {
-        if (is_array($object)) {
-            return $object[$key] ?? null;
-        } else if (is_object($object)) {
-            return $object->$key ?? null;
-        } else {
             return null;
         }
+        if (!is_object($data) && !is_array($data) && !EzDataUtils::isJson($data)
+            && !is_subclass_of($className, EzSerializeDataObject::class)) {
+            return null;
+        }
+        DBC::assertTrue(class_exists($className), "[EzObject] ClassName $className is not found!", 0, GearIllegalArgumentException::class);
+        if (is_subclass_of($className, BaseDTO::class)) {
+            return $className::create($data);
+        } else if (is_subclass_of($className, EzSerializeDataObject::class)) {
+            $serializerClass = Clazz::get($className)->getDeserializer();
+            if (is_null($serializerClass)) {
+                Logger::error("[EzObject] class {} not found! for class:{}", $serializerClass, $className);
+                return null;
+            } else {
+                return $serializerClass->deserialize($data);
+            }
+        } else {
+            return self::createNormalObject($data, $className);
+        }
     }
 
-    public static function cleanUp($obj) {
-        if (empty($obj) || self::isScalar($obj)) {
-            return $obj;
+    public static function createObjectList($data, string $className) {
+        if (empty($data)) {
+            return $data;
         }
-        foreach ($obj as $k => &$v) {
-            if (self::isString($v)) {
-                $v = str_replace(array("\r\n", "\r", "\n"), "", $v);
+        foreach ($data as &$dateItem) {
+            $dateItem = self::createObject($dateItem, $className);
+        }
+        return $data;
+    }
+
+    /**
+     * @param $data
+     * @param $className
+     * @return BaseDTO|EzIgnoreUnknow|object|null
+     * @throws ReflectionException|GearIllegalArgumentException
+     */
+    private static function createNormalObject($data, $className) {
+        $class = new $className;
+        $refClass = new EzReflectionClass($class);
+        $propertyAlias = self::analyseClassDocComment($refClass);
+        foreach ($data as $key => $dItem) {
+            try {
+                $key = $propertyAlias[$key] ?? $key;
+                $refProperty = $refClass->getProperty($key);
+            }catch (ReflectionException $reflectionException) {
+                $refProperty = null;
+            }
+            if (!$class instanceof EzIgnoreUnknow) {
+                DBC::assertNonNull($refProperty, "[EzObject] PropertyName $key is not found From Class $className!",
+                    0, GearIllegalArgumentException::class);
             } else {
-                $v = self::cleanUp($v);
+                if (is_null($refProperty)) {
+                    continue;
+                }
+            }
+            $doc = $refProperty->getDocComment();
+            list($struct, $propertyType) = self::analysePropertyDocComment($doc, $key, $dItem);
+            switch ($struct) {
+                case "LIST":
+                    $list = [];
+                    foreach ($dItem as $k => $item) {
+                        if (EzDataUtils::isScalar($item)) {
+                            $list[$k] = $item;
+                        } else {
+                            $list[$k] = self::createObject($item, $propertyType);
+                        }
+                    }
+                    $dItem = $list;
+                    break;
+                case "MAP":
+                    $map = [];
+                    foreach ($dItem as $k => $item) {
+                        if (EzDataUtils::isScalar($item)) {
+                            $map[$k] = $item;
+                        } else {
+                            $map[$k] = self::createObject($item, $propertyType[1]);
+                        }
+                    }
+                    $dItem = $map;
+                    break;
+                case "OBJECT":
+                    $dItem = self::createObject($dItem, $propertyType);
+                    break;
+                case "ARRAY":
+                default:
+                    break;
+            }
+
+            if ($refProperty->isPublic()) {
+                $refProperty->setValue($class, $dItem);
+            } else {
+                $refProperty->setAccessible(true);
+                $refProperty->setValue($class, $dItem);
+                $refProperty->setAccessible(false);
             }
         }
-        return $obj;
+        return $class;
+    }
+
+    private static function analyseClassDocComment(EzReflectionClass $reflectionClass) {
+        $propertyReflections = $reflectionClass->getProperties();
+        $hash = [];
+        foreach ($propertyReflections as $propertyReflection) {
+            $annoItem = $propertyReflection->getAnnoation(Clazz::get(JsonProperty::class));
+            if ($annoItem instanceof AnnoItem) {
+                $hash[$annoItem->value] = $propertyReflection->getName();
+            }
+        }
+        return $hash;
+    }
+
+    /**
+     * @param string $doc
+     * @param mixed $data
+     * @example {
+    @var array $data
+    @var ObjectClass $data
+    @var array<string> $data
+    @var array<ObjectClass> $data
+    @var array<string, string> $data
+    @var array<string, ObjectClass> $data
+     * }
+     * @return array<string, string>
+     */
+    private static function analysePropertyDocComment(string $doc, $column, &$data) {
+        if (empty($doc)) {
+            return [null, null];
+        }
+        preg_match("/\s+@required\s*/", $doc, $matched);
+        DBC::assertTrue(empty($matched) || isset($data), "[EzObject] Required Column $column Check Fail! Data Must Be Set!",
+            0, GearIllegalArgumentException::class);
+        preg_match("/\*\s+@var\s+(?<propertyType>[a-zA-Z0-9\s<>,]+)(\r\n|\s+[\$][A-Za-z0-9]+\s*|\s*\*\/)/", $doc, $matched);
+        $propertyTypeMatched = $matched['propertyType']??"";
+        if (empty($propertyTypeMatched)) {
+            return [null, null];
+        }
+        if (EzDataUtils::isScalarType($propertyTypeMatched)) {
+            $data = EzDataUtils::convertScalarToTrueType($data, $propertyTypeMatched);
+            /*DBC::assertTrue(EzDataUtils::dataTypeNameEquals(gettype($data), $propertyTypeMatched),
+                "[EzObject] Match data Fail! Type Must Be An $propertyTypeMatched, But ".gettype($data),
+                0, GearIllegalArgumentException::class);*/
+            return [null, null];
+        }
+        // 1. Array
+        if ("array" == $propertyTypeMatched) {
+            DBC::assertTrue(EzDataUtils::isArray($data), "[EzObject] Match data Fail! Type Must Be An Array, But ".gettype($data),
+                0, GearIllegalArgumentException::class);
+            return ["ARRAY", "array"];
+        }
+        // 2. MAP
+        preg_match("/array<(?<propertyType>\w+)\s*,\s*(?<propertyType2>\w+)>/", $propertyTypeMatched, $matched);
+        $propertyType = $matched['propertyType']??"";
+        $propertyType2 = $matched['propertyType2']??"";
+        if (!empty($propertyType2)) {
+            $newData = [];
+            foreach ($data as $datak => $datav) {
+                $newData[EzDataUtils::convertScalarToTrueType($datak, $propertyType)] =
+                    EzDataUtils::convertScalarToTrueType($datav, $propertyType2);
+            }
+            $data = $newData;
+            DBC::assertTrue(EzDataUtils::isMap($data, $propertyType, $propertyType2), "[EzObject] Match data Fail! Type Must Be a Map, But ".gettype($data),
+                0, GearIllegalArgumentException::class);
+            return ["MAP", [$propertyType, $propertyType2]];
+        }
+        // 3. LIST
+        preg_match("/array<\s*(?<propertyType>\w+)\s*>/", $propertyTypeMatched, $matched);
+
+        $propertyType = $matched['propertyType'] ?? "";
+        if (!empty($propertyType)) {
+            DBC::assertTrue(EzDataUtils::isList($data), "[EzObject] Match data Fail! Type Must Be a Map, But ".gettype($data),
+                0, GearIllegalArgumentException::class);
+            if (EzDataUtils::isScalarType($propertyType)) {;
+                foreach ($data as &$datum) {
+                    $datum = EzDataUtils::convertScalarToTrueType($datum, $propertyType);
+                }
+            }
+            return ["LIST", $propertyType];
+        }
+        // 4. OBJECT
+        preg_match("/(?<propertyType>^(?!array)\w+)/", $propertyTypeMatched, $matched);
+        $propertyType = $matched['propertyType']??"";
+        if (!empty($propertyType)) {
+            return ["OBJECT", $propertyType];
+        }
+        Logger::warn("[EzObject] May Has SomeThing Wrong With Match Object Type From Doc:{}", $doc);
+        return [null, null];
     }
 
     /**
@@ -259,7 +253,7 @@ class EzObjectUtils
         if (empty($obj)) {
             return null;
         }
-        $obj = self::ksortFromObject($obj);
+        $obj = EzDataUtils::ksortFromObject($obj);
         foreach ($obj as $key => $o) {
             if (is_array($o) || is_object($o)) {
                 $obj[$key] = self::identityCode($o);
@@ -268,90 +262,5 @@ class EzObjectUtils
         return md5(serialize($obj));
     }
 
-    /**
-     * @param object $obj
-     * @return stdClass
-     */
-    public static function ksortFromObject(object $obj) {
-        if (is_null($obj)) {
-            return null;
-        }
-        $obj = (array) $obj;
-        ksort($obj);
-        return json_decode(json_encode($obj));
-    }
-
-    /**
-     * the left is the diff of obj1 with obj2, the right is the diff of obj2 with obj1
-     * @param object|array $obj1
-     * @param object|array $obj2
-     * @return array<array<string>, array<string>>
-     * @throws Exception
-     */
-    public static function compareObjectStruct($obj1, $obj2, $style = null) {
-        $left = $right = [];
-        DBC::assertFalse(self::isScalar($obj1),
-            "[EzObjectUtils] the function expect params 1 is not scalar, but given: ".self::toString($obj1));
-        DBC::assertFalse(self::isScalar($obj2),
-            "[EzObjectUtils] the function expect params 2 is not scalar, but given: ".self::toString($obj2));
-        DBC::assertEquals(gettype($obj1), gettype($obj2),
-            "[EzObjectUtils] analyseObject expect params type is same, but given: ".gettype($obj1)." and " . gettype($obj2));
-        $keys1 = self::keys($obj1);
-        $keys2 = self::keys($obj2);
-
-        $diffLeft = array_diff($keys2, $keys1);
-        $diffRight = array_diff($keys1, $keys2);
-        $intersect = array_intersect($keys1, $keys2);
-        $left = array_merge($left, $diffLeft);
-        $right = array_merge($right, $diffRight);
-        foreach ($intersect as $intersectKey) {
-            $obj1Temp = self::getFromObject($obj1, $intersectKey);
-            $obj2Temp = self::getFromObject($obj2, $intersectKey);
-            if (self::isScalar($obj1Temp)) {
-                $obj1Temp = [];
-            }
-            if (self::isScalar($obj2Temp)) {
-                $obj2Temp = [];
-            }
-            list($leftTemp, $rightTemp) = self::compareObjectStruct($obj1Temp, $obj2Temp, $style);
-            $leftTemp = self::appendKey($intersectKey, $leftTemp, $style);
-            $rightTemp = self::appendKey($intersectKey, $rightTemp, $style);
-            $left = array_merge($left, $leftTemp);
-            $right = array_merge($right, $rightTemp);
-        }
-        return [$left, $right];
-    }
-
-    public static function keys($obj) {
-        if (is_array($obj)) {
-            return array_keys($obj);
-        } else if (is_object($obj)) {
-            return array_keys(get_object_vars($obj));
-        } else {
-            return [];
-        }
-    }
-
-    private static function appendKey($intersectKey, $temp, $style = null) {
-        if (empty($temp)) {
-            return [];
-        }
-        return array_map(function ($item) use ($intersectKey, $style) {
-            return self::appendKeyStyle($intersectKey, $item, $style);
-        }, $temp);
-    }
-
-    private static function appendKeyStyle($sourceKey, $appendKey, $style = null) {
-        $style = empty($style) ? $style : strtoupper($style);
-        switch ($style) {
-            case "JAVA":
-                return $sourceKey.".".$appendKey;
-            case "PHP":
-            case "PHP_OBJECT":
-                return $sourceKey."->".$appendKey;
-            default:
-                return $sourceKey."|".$appendKey;
-        }
-    }
 
 }

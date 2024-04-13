@@ -190,7 +190,7 @@ class DBC
      * @throws Exception
      */
     public static function assertList($obj, $msg, $code = 0, $clazz = GearRunTimeException::class) {
-        self::assertTrue(EzObjectUtils::isList($obj), $msg, $code, $clazz);
+        self::assertTrue(EzDataUtils::isList($obj), $msg, $code, $clazz);
     }
 
     /**
@@ -202,7 +202,7 @@ class DBC
      * @throws Exception
      */
     public static function assertNotList($obj, $msg, $code = 0, $clazz = GearRunTimeException::class) {
-        self::assertFalse(EzObjectUtils::isList($obj), $msg, $code, $clazz);
+        self::assertFalse(EzDataUtils::isList($obj), $msg, $code, $clazz);
     }
 
     public static function assertInRange(string $expect, int $actual, $msg, $code = 0, $clazz = GearRunTimeException::class) {

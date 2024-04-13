@@ -230,7 +230,7 @@ class Gear
         $v = $annoItem->getValue();
         DBC::assertNotEmpty($v->constStruct(), "[Gear] Anno $k Must Defined Const STRUCT!");
         $target = $v->constTarget();
-        if (EzObjectUtils::isList($target)) {
+        if (EzDataUtils::isList($target)) {
             DBC::assertTrue(in_array($annoItem->at, $target),
                 "[Gear] Anno $k Must Used At ".AnnoElementType::getDesc($target)."!");
         } else {

@@ -140,6 +140,7 @@ abstract class BaseDAO implements EzBean
             $appendSql = "select * from $this->table ".strtolower($appendSql);
             preg_match('/^(\s*select\s+(?P<select>.*))\s+from\s+(?P<from>[^\s]+)?(\s+where\s+(?P<where>.*?))?(\s+group\s+by\s+(?P<groupby>[\w,\s]+?))?(?:\s+having\s+(?P<having>.*?))?(?:\s+order\s+by\s+(?P<orderby>[\w`,\s]+)?)?(?:\s+limit\s+(?P<offset>\d+\s?),(?P<limit>\s?\d+?))?\s*$/i', $appendSql, $matches);
             $whereSql = "where {$matches['where']}";
+            $splitSql = [];
             for ($i=0;$i<$this->splitCnt;$i++) {
                 $tmpTable = sprintf($this->table, $i);
                 $tmpParams = $params;

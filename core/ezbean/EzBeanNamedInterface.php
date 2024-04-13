@@ -20,6 +20,6 @@ class EzBeanNamedInterface implements EzDataObject
     }
 
     public function toString() {
-        return EzObjectUtils::toString($this);
+        return EzDataUtils::toString($this);
     }
 }

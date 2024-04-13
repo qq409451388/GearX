@@ -148,10 +148,8 @@ class Application
      * @return array
      */
     private static function searchModules($dependencies) {
-        $dependenciedNeedToImport = [];
         $classes = [];
         foreach ($dependencies as $dependency) {
-            //$dependenciedNeedToImport[$dependency] = null;
             $subDependencies = DependencyCollector::analyse($dependency);
             if (!empty($subDependencies)) {
                 self::searchModules($subDependencies);
@@ -413,7 +411,7 @@ class ApplicationContext {
         }
         $this->appSourceClassPath = $this->appPath."/src";
         if (!is_dir($this->appPath) || !is_dir($this->appSourceClassPath)) {
-            exit("[error]The appPath must be set at valid project <Root Path>!");
+            exit("[error] The arguments <appPath> must be set at valid project Root Path!");
         }
         if (empty($this->gearPath)) {
             echo "[".date("Y-m-d H:i:s")."][WARN]Gear framework path not specified, loading default [project_path/GearX] configuration".PHP_EOL;
