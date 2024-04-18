@@ -1,31 +1,10 @@
 <?php
 abstract class BaseEzHttp extends AbstractTcpServer
 {
-    /**
-     * @var IDispatcher
-     */
-    protected $dispatcher;
     protected $_root;
     protected $staticCache = [];
 
-    /**
-     * 设置分发器
-     * @param IDispatcher|string $dispatcher
-     * @return $this
-     * @throws Exception
-     */
-    public function setDispatcher($dispatcher) {
-        if (is_string($dispatcher) && class_exists($dispatcher)) {
-            $dispatcher = new $dispatcher;
-        }
-        DBC::assertTrue($dispatcher instanceof IDispatcher,
-            "[EzHttp] dispatcher Must be instance of IDispatcher!", 0, GearShutDownException::class);
-        $this->dispatcher = $dispatcher;
-        return $this;
-    }
-
     protected function setPropertyCustom() {
-        $this->setDispatcher(Gear::class);
         $this->_root = "./";
     }
 
@@ -38,7 +17,6 @@ abstract class BaseEzHttp extends AbstractTcpServer
          * @var Request $request
          */
         $request = $this->interpreter->decode($buf);
-        $request->setDispatcher($this->dispatcher);
         return $request;
     }
 
@@ -57,7 +35,10 @@ abstract class BaseEzHttp extends AbstractTcpServer
                 if(empty($this->_root)){
                     return (new Response(HttpStatus::NOT_FOUND()));
                 }
-                $fullPath = Env::staticPath().DIRECTORY_SEPARATOR.$path;
+                if (empty(Config::get("application.static_path"))) {
+                    Logger::console("[EzHttp] the static path is unset.");
+                }
+                $fullPath = Config::get("application.static_path", "").DIRECTORY_SEPARATOR.$path;
                 if(empty($path) || !is_file($fullPath)) {
                     return (new Response(HttpStatus::NOT_FOUND()));
                 }
@@ -100,8 +81,8 @@ abstract class BaseEzHttp extends AbstractTcpServer
         return HttpMimeType::MIME_TYPE_LIST[end($type)] ?? HttpMimeType::MIME_HTML;
     }
 
-    private function judgePath($path){
-        return $this->dispatcher->judgePath($path);
+    private function judgePath($path):bool {
+        var_dump($path);
     }
 
     private function getDynamicResponse(IRequest $request):IResponse{

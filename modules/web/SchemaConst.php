@@ -7,7 +7,8 @@ class SchemaConst
     const RESP = "resp";
 
     public static function isHttpOrSecurity() {
-        return self::HTTP === Config::get("schema") || self::HTTPS === Config::get("schema");
+        return self::HTTP === Config::get("application.server.schema")
+            || self::HTTPS === Config::get("application.server.schema");
     }
 
     public static function isWebSocket() {

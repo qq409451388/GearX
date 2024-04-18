@@ -14,12 +14,24 @@ abstract class AbstractTcpServer
      */
     protected $interpreter;
 
-    public function __construct(string $ip, int $port) {
+    public function __construct(string $ip = "", int $port = -1) {
+        if (empty($ip)) {
+            $ip = Config::get('application.server.ip');
+            if (empty($ip)) {
+                $ip = "127.0.0.1";
+            }
+        }
+        if (-1 === $port) {
+            $port = Config::get('application.server.port');
+            if (empty($port)) {
+                $port = 8080;
+            }
+        }
         $this->ip = $ip;
         $this->port = $port;
-        Config::set(['ip'=>$ip, 'port'=>$port]);
+        Config::set(['application.server.ip'=>$ip, 'application.server.port'=>$port]);
         $this->setInterpreterInstance();
-        Config::setOne('schema', $this->interpreter->getSchema());
+        Config::setOne('application.server.schema', $this->interpreter->getSchema());
         $this->setTcpServerInstance();
         $this->setPropertyCustom();
     }

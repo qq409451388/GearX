@@ -1,13 +1,9 @@
 <?php
 class EzHttp extends BaseEzHttp
 {
-    protected function setPropertyCustom() {
-        $this->setDispatcher(GearLite::class);
-        $this->_root = "./";
-    }
 
-    public static function create(string $ip, int $port, $dispatcher = GearLite::class) {
-        (new EzHttp($ip, $port))->setDispatcher($dispatcher)->start();
+    public static function create(string $ip, int $port) {
+        (new EzHttp($ip, $port))->start();
     }
 
     protected function setTcpServerInstance() {
@@ -20,7 +16,7 @@ class EzHttp extends BaseEzHttp
             if (is_null($request)) {
                 $request = $this->buildRequest($buf);
                 $request->setConnection($connection);
-                DBC::assertLessThan(Config::get("application.HTTP_SERVER_REQUEST_LIMIT", 1024 * 1024 * 2),
+                DBC::assertLessThan(Config::get("application.server.http_server_request_limit", 1024 * 1024 * 2),
                     $request->getContentLen(),
                     "[HTTP] Request body is too large!", 0, GearShutDownException::class);
             } else {
@@ -44,7 +40,6 @@ class EzHttp extends BaseEzHttp
     public function start() {
         Logger::console("[HTTP]Start HTTP Server...");
         try{
-            $this->dispatcher->initWithHttp();
             $this->socket->init();
             $this->socket->start();
         } catch (Exception $e) {

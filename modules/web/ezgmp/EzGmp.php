@@ -1,5 +1,5 @@
 <?php
-class EzGmp extends BaseHTTP
+class EzGmp extends BaseEzHttp
 {
     /**
      * 启动http服务
@@ -48,5 +48,10 @@ class EzGmp extends BaseHTTP
                 socket_close($msgsocket);
             }
         }
+    }
+
+    protected function setTcpServerInstance()
+    {
+        // TODO: Implement setTcpServerInstance() method.
     }
 }

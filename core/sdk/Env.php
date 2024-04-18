@@ -80,7 +80,7 @@ class Env
     }
 
     private static function getEnv(){
-        return @defined("ENV") ? strtoupper(ENV) : null;
+        return strtoupper(Config::get("application.env"));
     }
 
     public static function staticPath(){

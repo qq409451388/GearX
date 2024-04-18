@@ -34,7 +34,7 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
     private $requestId;
 
     /**
-     * @var IDispatcher $dispatcher 分发器
+     * @var Gear $dispatcher 分发器
      */
     private $dispatcher;
 
@@ -205,23 +205,23 @@ class Request extends NetWorkRequest implements IRequest,EzDataObject
     }
 
     /**
-     * @return IDispatcher
+     * @return Gear
      */
-    public function getDispatcher(): IDispatcher
+    public function getDispatcher(): Gear
     {
         return $this->dispatcher;
     }
 
     /**
-     * @param IDispatcher $dispatcher
+     * @param Gear $dispatcher
      */
-    public function setDispatcher(IDispatcher $dispatcher): void
+    public function setDispatcher(Gear $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
     public function toString () {
-        return EzObjectUtils::toString(get_object_vars($this));
+        return EzString::toString(get_object_vars($this));
     }
 
     /**
