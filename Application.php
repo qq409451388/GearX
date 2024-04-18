@@ -131,7 +131,7 @@ class Application
         if (is_null($dependencies)) {
             return;
         }
-        $hash = self::searchModules(EzBeanUtils::createObjectList($dependencies, DependencyInfo::class));
+        $hash = self::searchModules(EzObjectUtils::createObjectList($dependencies, DependencyInfo::class));
         $this->register($hash);
         $classes = [];
         // regist Components
