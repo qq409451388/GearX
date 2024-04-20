@@ -6,6 +6,8 @@
  */
 class Application
 {
+    private $gear;
+
     /**
      * @var ApplicationContext $context
      */
@@ -131,6 +133,7 @@ class Application
         if (is_null($dependencies)) {
             return;
         }
+        Logger::info("[Application] Start Searching modules...");
         $hash = self::searchModules(EzObjectUtils::createObjectList($dependencies, DependencyInfo::class));
         $this->register($hash);
         $classes = [];
@@ -147,14 +150,20 @@ class Application
      * @param array<DependencyInfo> $dependencies
      * @return array
      */
-    private static function searchModules($dependencies) {
+    private static function searchModules($dependencies, $parentModule = null) {
         $classes = [];
+        $preFix = empty($parentModule) ? "" : $parentModule.'->';
         foreach ($dependencies as $dependency) {
-            $subDependencies = DependencyCollector::analyse($dependency);
-            if (!empty($subDependencies)) {
-                self::searchModules($subDependencies);
-            }
+            Logger::info("[Application] >>>>>> Import module: [$preFix$dependency->name] <<<<<<");
             $classes += DependencyCollector::import($dependency);
+            Logger::info("[Application] Analyse sub module: $preFix$dependency->name");
+            $subDependencies = DependencyCollector::analyseSubDependencies($dependency);
+            if (!empty($subDependencies)) {
+                Logger::info("[Application] Subdependencies found, Extra Searching subdependencies...");
+                $classes += self::searchModules($subDependencies, $preFix.$dependency->name);
+            } else {
+                Logger::info("[Application] No subdependencies found.");
+            }
         }
         return $classes;
     }
@@ -297,27 +306,8 @@ class Application
         Config::init();
         $app->loadModulePackages();
         $app->loadWebServerContainer();
+        $app->gear = Clazz::get(Gear::class)->new();
         return $app;
-    }
-
-    /**
-     * The Schedule Task Mode Startup
-     * 1.Environment Variable Configuration
-     * 2.Core Loading
-     * 3.Configuration Injection
-     * 4.Dependency Package Loading
-     * @param $constants
-     * @return SchduleTaskApplication
-     */
-    public static function loadSchduleTask($constants = null) {
-        $app = new self();
-        $app->envConstants($constants);
-        $app->loadCore();
-        Env::setRunModeConsole();
-        $app->initConfig();
-        $app->loadModulePackages();
-        $app->loadSchduleTaskModule();
-        return new SchduleTaskApplication($app);
     }
 }
 

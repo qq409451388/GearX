@@ -15,7 +15,7 @@ class AnnoationRule implements EzHelper
         $valueType = $annoName->callStatic("constStruct");
         $at = $annoName->callStatic("constTarget");
         $refTarget = self::getRefTarget($reflection);
-        if (EzDataUtils::isArray($at)) {
+        if (EzCheckUtils::isArray($at)) {
             DBC::assertTrue(in_array($refTarget, $at), "[AnnoationRule] Unsupport positon!");
         } else {
             DBC::assertEquals($at, $refTarget, "[AnnoationRule] Unsupport positon!");

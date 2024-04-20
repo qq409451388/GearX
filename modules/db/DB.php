@@ -21,7 +21,7 @@ class DB{
 
     private function getDbConfig($database, $env = null)
     {
-        $this->dbCon = Config::getRecursion('dbcon');
+        $this->dbCon = Config::getRecursion('db');
         if(is_null($env)){
             DBC::throwEx("[DB] Null Env");
         }
