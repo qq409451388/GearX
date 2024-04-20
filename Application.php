@@ -6,7 +6,10 @@
  */
 class Application
 {
-    private $gear;
+    /**
+     * @var array<EzStarter>
+     */
+    private $starterRegisters = [];
 
     /**
      * @var ApplicationContext $context
@@ -120,15 +123,31 @@ class Application
         Application::$context->setGlobalCoreClass($classes);
     }
 
-    // todo 类加载 区分场景，http、tcp等
-    protected function loadWebServerContainer() {
+    protected function loadAppContainer() {
         $hash = $this->getFilePaths(Application::$context->getAppSourceClassPath());
         $this->register($hash);
         $classes = array_keys($hash);
         Application::$context->setAppSourceClass($classes);
+
+        if (!empty($classess)) {
+            foreach($classess as $class) {
+                $this->createBean($class);
+            }
+        }
     }
 
-    protected function loadModulePackages() {
+    private function startRegister() {
+        Logger::info("[Application] Start Register...");
+        array_unshift($this->starterRegisters, new AnnoationStarter());
+        foreach ($this->starterRegisters as $register) {
+            Logger::info("[Application] Init Third StartRegister {}", get_class($register));
+            $register->init();
+            $register->start();
+            Logger::info("[Application] Inited {} StartRegister Success!", get_class($register));
+        }
+    }
+
+    protected function loadModulePackagesAndRegister() {
         $dependencies = Config::get("application.dependency");
         if (is_null($dependencies)) {
             return;
@@ -141,6 +160,10 @@ class Application
         foreach ($hash as $className => $classPath) {
             if (is_subclass_of($className, EzComponent::class)) {
                 $classes[] = $className;
+            }
+
+            if (is_subclass_of($className, EzStarter::class)) {
+                $this->starterRegisters[] = Clazz::get($className)->new();
             }
         }
         Application::$context->setGlobalComponentClass($classes);
@@ -259,13 +282,69 @@ class Application
         return self::OS_MAC === self::getSimlpeOs();
     }
 
-    protected function register($hash) {
+    private function register($hash) {
         spl_autoload_register(function ($className) use($hash){
             $filePath = $hash[$className] ?? "";
             if(file_exists($filePath)){
                 include($filePath);
             }
         });
+    }
+
+    /**
+     * 自动注册继承自BaseController的公共函数的路由
+     * 路径规则：类名/方法名
+     * @deprecated
+     * @return void
+     * @throws ReflectionException
+     */
+    protected function initRouter() {
+        /**
+         * @var DynamicProxy $obj
+         */
+        foreach(BeanFinder::get()->getAll(DynamicProxy::class) as $objName => $obj) {
+            $reflection = $obj->__CALL__getReflectionClass();
+            if(!$reflection->isSubclassOf(BaseController::class)) {
+                continue;
+            }
+            $reflectionMethods = $reflection->getMethods();
+            foreach($reflectionMethods as $reflectionMethod) {
+                if(!$reflectionMethod->isPublic()
+                    || BaseController::class === $reflectionMethod->getDeclaringClass()->getName()){
+                    continue;
+                }
+                if (!$reflectionMethod->isUserDefined() || $reflectionMethod->isConstructor()) {
+                    continue;
+                }
+                $defaultPath = $objName . '/' . $reflectionMethod->getName();
+                EzRouter::get()->setMapping($defaultPath, $reflection->getName(), $reflectionMethod->getName());
+            }
+        }
+    }
+
+    /**
+     * create an obj if none in objects[]
+     * @param string $class
+     * @return void
+     * @throws Exception
+     */
+    private function createBean($class){
+        if (!is_subclass_of($class, EzBean::class)) {
+            return;
+        }
+        try {
+            /**
+             * isDeep传false， 交由注解逻辑:startAnno()统一注入
+             */
+            $bean = EzBeanUtils::createBean($class, false);
+            if (is_null($bean)) {
+                return;
+            }
+            BeanFinder::get()->save($class, $bean);
+            Logger::console("[Gear]Create Bean {$class}");
+        } catch (Exception $e) {
+            DBC::throwEx("[Gear]Create Bean Exception {$e->getMessage()}", 0, GearShutDownException::class);
+        }
     }
 
     /**
@@ -304,9 +383,9 @@ class Application
         $app->loadCore();
         Env::setRunModeConsole();
         Config::init();
-        $app->loadModulePackages();
-        $app->loadWebServerContainer();
-        $app->gear = Clazz::get(Gear::class)->new();
+        $app->loadModulePackagesAndRegister();
+        $app->loadAppContainer();
+        $app->startRegister();
         return $app;
     }
 }
