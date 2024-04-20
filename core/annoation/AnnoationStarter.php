@@ -161,11 +161,11 @@ class AnnoationStarter implements EzStarter
 
 
     /**
-     * @param AnnoItem $annoItem
+     * @param AnnoationElement $annoItem
      * @return Aspect
      * @throws Exception
      */
-    private function buildPoorAspect(AnnoItem $annoItem){
+    private function buildPoorAspect(AnnoationElement $annoItem){
         $k = $annoItem->annoName;
         $v = $annoItem->getValue();
         DBC::assertNotEmpty($v->constStruct(), "[Gear] Anno $k Must Defined Const STRUCT!");

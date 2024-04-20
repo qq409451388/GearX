@@ -8,7 +8,7 @@ class AnnoationRule implements EzHelper
     /**
      * @param EzReflectionClass|EzReflectionMethod|EzReflectionProperty $reflection
      * @param Clazz                                                     $annoName
-     * @return AnnoItem
+     * @return AnnoationElement
      * @throws Exception
      */
     public static function searchAnnoation($reflection, Clazz $annoName) {
@@ -56,7 +56,7 @@ class AnnoationRule implements EzHelper
      * @param string $document
      * @param int $at {@see AnnoElementType}
      * @param string $annoName implements Anno
-     * @return AnnoItem
+     * @return AnnoationElement
      */
     public static function searchCertainlyLiteAnnoationFromDoc($document, $at, $annoName) {
         if (empty($annoName)) {
@@ -71,14 +71,14 @@ class AnnoationRule implements EzHelper
         if (empty($matched)) {
             return null;
         }
-        return AnnoItem::create($annoName, null, $at);
+        return AnnoationElement::create($annoName, null, $at);
     }
 
     /**
      * @param string $document
      * @param int $at {@see AnnoElementType}
      * @param string $annoName implements Anno
-     * @return AnnoItem
+     * @return AnnoationElement
      */
     public static function searchCertainlyNormalAnnoationFromDoc($document, $at, $annoName) {
         if (empty($annoName)) {
@@ -93,13 +93,13 @@ class AnnoationRule implements EzHelper
         if (empty($matched['content'])) {
             return null;
         }
-        return AnnoItem::create($annoName, $matched['content'], $at);
+        return AnnoationElement::create($annoName, $matched['content'], $at);
     }
 
     /**
      * @param string $document
      * @param int $at {@see AnnoElementType}
-     * @return AnnoItem
+     * @return AnnoationElement
      */
     public static function searchCertainlyListAnnoationFromDoc($document, $at, $annoName) {
         if (!is_subclass_of($annoName, Anno::class)) {
@@ -122,13 +122,13 @@ class AnnoationRule implements EzHelper
             return null;
         }
         $arr = array_column($matchedes2, "value");
-        return AnnoItem::createComplex($annoName, $arr, $at);
+        return AnnoationElement::createComplex($annoName, $arr, $at);
     }
 
     /**
      * @param string $document
      * @param int $at {@see AnnoElementType}
-     * @return AnnoItem
+     * @return AnnoationElement
      */
     public static function searchCertainlyRelationshipAnnoationFromDoc($document, $at, $annoName) {
         if (!is_subclass_of($annoName, Anno::class)) {
@@ -151,11 +151,11 @@ class AnnoationRule implements EzHelper
             return null;
         }
         $arr = array_combine(array_column($matchedes2, "key"), array_column($matchedes2, "value"));
-        return AnnoItem::createComplex($annoName, $arr, $at);
+        return AnnoationElement::createComplex($annoName, $arr, $at);
     }
 
     /**
-     * @return AnnoItem
+     * @return AnnoationElement
      */
     public static function searchCertainlyRelationshipAnnoation($class, $annoName) {
         return self::searchCertainlyRelationshipAnnoationFromDoc((new ReflectionClass($class))->getDocComment(),
@@ -165,7 +165,7 @@ class AnnoationRule implements EzHelper
     /**
      * @param string $document
      * @param int $at {@see AnnoElementType}
-     * @return array<AnnoItem>
+     * @return array<AnnoationElement>
      */
     public static function searchNormalAnnoation($document, $at) {
         $list = [];
@@ -189,7 +189,7 @@ class AnnoationRule implements EzHelper
                 Logger::warn("[Gear] UnExpected AnnoInfo:{} ({})", $annoName, $content);
                 continue;
             }
-            $list[] = AnnoItem::create($annoName, $content, $at);
+            $list[] = AnnoationElement::create($annoName, $content, $at);
         }
         return $list;
     }
@@ -197,7 +197,7 @@ class AnnoationRule implements EzHelper
     /**
      * @param string $document
      * @param int $at {@see AnnoElementType}
-     * @return array<AnnoItem>
+     * @return array<AnnoationElement>
      */
     public static function searchJsonAnnoation($document, $at) {
         $list = [];
@@ -226,7 +226,7 @@ class AnnoationRule implements EzHelper
                 continue;
             }
             $content = EzCollectionUtils::decodeJson($content);
-            $list[] = AnnoItem::createComplex($annoName, $content, $at);
+            $list[] = AnnoationElement::createComplex($annoName, $content, $at);
         }
         return $list;
     }
@@ -234,7 +234,7 @@ class AnnoationRule implements EzHelper
     /**
      * @param string $document
      * @param int $at {@see AnnoElementType}
-     * @return array<AnnoItem>
+     * @return array<AnnoationElement>
      */
     public static function searchLiteAnnoation($document, $at) {
         $list = [];
@@ -253,7 +253,7 @@ class AnnoationRule implements EzHelper
                 Logger::warn("[Gear] UnExpected AnnoInfo:{}", $annoName);
                 continue;
             }
-            $list[] = AnnoItem::createComplex($annoName, null, $at);
+            $list[] = AnnoationElement::createComplex($annoName, null, $at);
         }
         return $list;
     }
@@ -262,7 +262,7 @@ class AnnoationRule implements EzHelper
      * todo 支持中文
      * @param string $document
      * @param int $at {@see AnnoElementType}
-     * @return array<AnnoItem>
+     * @return array<AnnoationElement>
      */
     public static function searchListAnnoation($document, $at) {
         $list = [];
@@ -288,7 +288,7 @@ class AnnoationRule implements EzHelper
                 continue;
             }
             $arr = array_combine(array_column($matchedes2, "key"), array_column($matchedes2, "value"));
-            $list[] = AnnoItem::createComplex($annoName, $arr, $at);
+            $list[] = AnnoationElement::createComplex($annoName, $arr, $at);
         }
         return $list;
     }
@@ -297,7 +297,7 @@ class AnnoationRule implements EzHelper
      * 冲突！和searchNormal
      * @param string $document
      * @param int $at {@see AnnoElementType}
-     * @return array<AnnoItem>
+     * @return array<AnnoationElement>
      */
     public static function searchRelationshipAnnoation($document, $at) {
         $list = [];
@@ -322,7 +322,7 @@ class AnnoationRule implements EzHelper
                 continue;
             }
             $arr = array_combine(array_column($matchedes2, "key"), array_column($matchedes2, "value"));
-            $list[] = AnnoItem::createComplex($annoName, $arr, $at);
+            $list[] = AnnoationElement::createComplex($annoName, $arr, $at);
         }
         return $list;
     }
@@ -330,7 +330,7 @@ class AnnoationRule implements EzHelper
     /**
      * @param string $document
      * @param int $at {@see AnnoElementType}
-     * @return array<AnnoItem>
+     * @return array<AnnoationElement>
      */
     public static function searchAnnoationFromDocument($document, $at) {
         return array_merge(

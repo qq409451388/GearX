@@ -6,7 +6,7 @@ class EzReflectionClass extends ReflectionClass
 
     /**
      * 获取类上的所有注解
-     * @return array<AnnoItem>
+     * @return array<AnnoationElement>
      */
     public function getAnnoationList() {
         return AnnoationRule::searchAnnoationFromDocument($this->getDocComment(), AnnoElementType::TYPE_CLASS);
@@ -15,7 +15,7 @@ class EzReflectionClass extends ReflectionClass
     /**
      * 获取属性中的指定注解
      * @param Clazz $annoClazz
-     * @return array<AnnoItem>
+     * @return array<AnnoationElement>
      * @throws ReflectionException
      */
     public function getPropertyAnnotationList(Clazz $annoClazz) {
@@ -23,7 +23,7 @@ class EzReflectionClass extends ReflectionClass
         $annoList = [];
         foreach ($properties as $property) {
             $annoItem = $property->getAnnoation($annoClazz);
-            if ($annoItem instanceof AnnoItem) {
+            if ($annoItem instanceof AnnoationElement) {
                 $annoList[$property->getName()] = $annoItem;
             }
         }

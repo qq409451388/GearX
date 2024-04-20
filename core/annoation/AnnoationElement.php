@@ -1,5 +1,5 @@
 <?php
-class AnnoItem
+class AnnoationElement
 {
     public $annoName;
     /**
@@ -20,7 +20,7 @@ class AnnoItem
     public $paramType;
 
     public static function create($n, $v, $a){
-        $obj = new AnnoItem();
+        $obj = new AnnoationElement();
         $obj->annoName = $n;
         $obj->value = $v;
         $obj->at = $a;
@@ -29,7 +29,7 @@ class AnnoItem
     }
 
     public static function createComplex($n, $v, $a){
-        $obj = new AnnoItem();
+        $obj = new AnnoationElement();
         $obj->annoName = $n;
         $obj->value = $v;
         $obj->at = $a;

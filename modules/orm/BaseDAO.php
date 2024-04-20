@@ -24,10 +24,10 @@ abstract class BaseDAO implements EzBean
             "[DAO] create Fail!",0, GearShutDownException::class);
 
         /**
-         * @var AnnoItem $annoItem
+         * @var AnnoationElement $annoItem
          */
         $annoItem = AnnoationRule::searchCertainlyRelationshipAnnoation($this->entityClazz->getName(), EntityBind::class);
-        if ($annoItem instanceof AnnoItem) {
+        if ($annoItem instanceof AnnoationElement) {
             /**
              * @var EntityBind $anno
              */
@@ -37,10 +37,10 @@ abstract class BaseDAO implements EzBean
             $this->database = $anno->getDb();
         } else {
             /**
-             * @var AnnoItem $annoItem
+             * @var AnnoationElement $annoItem
              */
             $annoItem = AnnoationRule::searchCertainlyRelationshipAnnoation($this->entityClazz->getName(), EntityBindSplit::class);
-            DBC::assertTrue($annoItem instanceof AnnoItem, "[DAO] create Fail!", 0, GearShutDownException::class);
+            DBC::assertTrue($annoItem instanceof AnnoationElement, "[DAO] create Fail!", 0, GearShutDownException::class);
             /**
              * @var EntityBindSplit $anno
              */
@@ -218,7 +218,7 @@ abstract class BaseDAO implements EzBean
     public function save(AbstractDO $domain) {
         $refClass = new EzReflectionClass($domain);
         $annoItme = $refClass->getAnnoation(Clazz::get(IdGenerator::class));
-        if ($annoItme instanceof AnnoItem) {
+        if ($annoItme instanceof AnnoationElement) {
             /**
              * @var EzIdClient $idClient
              */
