@@ -7,6 +7,26 @@
     {
       "name": "GearModule-DB",
       "alias": "db"
+    },
+    {
+        "name": "GearModule-EzCurl",
+        "alias": "ezcurl"
+    },
+    {
+        "name": "GearModule-Util",
+        "alias": "utils"
+    },
+    {
+        "name": "GearModule-EzCache",
+        "alias": "ezcache"
+    },
+    {
+        "name": "GearModule-ORM",
+        "alias": "orm"
+    },
+    {
+        "name": "GearModule-WEB",
+        "alias": "web"
     }
   ]
 }
