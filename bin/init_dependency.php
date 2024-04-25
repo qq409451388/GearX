@@ -25,7 +25,7 @@ if (!is_null($moduleList)) {
 
 $runRightNow = !empty($args["-r"]) && $args["-r"] === 'true';
 
-$modulePath =  $gearPath.DIRECTORY_SEPARATOR.'modules_test';
+$modulePath =  $gearPath.DIRECTORY_SEPARATOR.'modules';
 if (!is_dir($modulePath)) {
     mkdir($modulePath);
 }
