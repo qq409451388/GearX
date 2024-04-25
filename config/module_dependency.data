@@ -1,0 +1,12 @@
+{
+  "server": "github.com",
+  "at": "qq409451388",
+  "author": "poethan",
+  "email": "poethan@foxmail.com",
+  "repository": [
+    {
+      "name": "GearModule-DB",
+      "alias": "db"
+    }
+  ]
+}
