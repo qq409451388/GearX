@@ -4,5 +4,10 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/modules_test" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/modules_test/db" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/modules_test/ezcache" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/modules_test/ezcurl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/modules_test/orm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/modules_test/utils" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/modules_test/web" vcs="Git" />
   </component>
 </project>
