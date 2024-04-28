@@ -10,7 +10,7 @@ class EzReflectionMethod extends ReflectionMethod
     /**
      * @return array<EzReflectionParameter>
      */
-    public function getParameters() {
+    public function getParameters():array {
         $parameters = parent::getParameters();
         $newParameters = [];
         foreach ($parameters as $parameter) {

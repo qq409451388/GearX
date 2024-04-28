@@ -56,7 +56,7 @@ class Env
         if (!empty($ipAddress)) {
             return $ipAddress;
         }
-        if (self::isUnix()) {
+        if (self::isLinux()) {
             $interface = 'eth0'; // 网卡名称
             $ifconfigInfo = shell_exec('/sbin/ifconfig ' . $interface);
             if (preg_match('/inet\s+([0-9\.]+)/', $ifconfigInfo, $matches)) {

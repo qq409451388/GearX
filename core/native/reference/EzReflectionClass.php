@@ -35,7 +35,7 @@ class EzReflectionClass extends ReflectionClass
      * @return EzReflectionMethod[]
      * @throws ReflectionException
      */
-    public function getMethods($filter = null) {
+    public function getMethods($filter = null):array {
         $methods = parent::getMethods($filter);
         $list = [];
         foreach ($methods as $method) {
@@ -49,7 +49,7 @@ class EzReflectionClass extends ReflectionClass
      * @return EzReflectionMethod
      * @throws ReflectionException
      */
-    public function getMethod($name) {
+    public function getMethod($name) : EzReflectionMethod {
         return new EzReflectionMethod($this->getName(), $name);
     }
 
@@ -58,7 +58,7 @@ class EzReflectionClass extends ReflectionClass
      * @return EzReflectionProperty[]
      * @throws ReflectionException
      */
-    public function getProperties($filter = null) {
+    public function getProperties($filter = null):array {
         $properties = parent::getProperties($filter);
         $list = [];
         foreach ($properties as $property) {
@@ -72,7 +72,7 @@ class EzReflectionClass extends ReflectionClass
      * @return EzReflectionProperty
      * @throws ReflectionException
      */
-    public function getProperty($name) {
+    public function getProperty($name):EzReflectionProperty {
         return new EzReflectionProperty($this->getName(), $name);
     }
 }
