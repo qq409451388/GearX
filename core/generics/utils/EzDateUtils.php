@@ -102,4 +102,7 @@ class EzDateUtils
         return $res;
     }
 
+    public static function isValid($obj) {
+        return false !== strtotime($obj);
+    }
 }

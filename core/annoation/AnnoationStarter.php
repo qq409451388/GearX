@@ -22,7 +22,7 @@ class AnnoationStarter implements EzStarter
      * @param array<Aspect> $aspectList
      * @return void
      */
-    private function fetchAnnoFromClass($reflection, array &$aspectList, array &$twichClassAnno) {
+    private function fetchAnnoFromClass($reflection, array &$aspectList, array &$twichClassAspect) {
         $classAnnoList = $reflection->getAnnoationList();
         foreach($classAnnoList as $classAnno){
             $aspectClass = $this->buildPoorAspect($classAnno);
@@ -31,7 +31,7 @@ class AnnoationStarter implements EzStarter
             }
             $aspectClass->setAtClass($reflection);
             if(!is_null($aspectClass->getDependConf())){
-                $twichClassAnno[] = $aspectClass;
+                $twichClassAspect[] = $aspectClass;
             }else{
                 $aspectList[] = $aspectClass;
             }
@@ -135,7 +135,7 @@ class AnnoationStarter implements EzStarter
             $twichClassAspect = [];
             $aspectMethodList = [];
             $aspectPropertyList = [];
-            $this->fetchAnnoFromClass($reflection, $aspectList, $twichClassAnno);
+            $this->fetchAnnoFromClass($reflection, $aspectList, $twichClassAspect);
             $this->fetchAnnoFromMethod($reflection, $aspectList, $aspectMethodList);
             $this->fetchAnnoFromProperty($reflection, $aspectList, $aspectPropertyList);
             $this->fetchAnnoForDepend($twichClassAspect, $aspectMethodList, $aspectPropertyList, $aspectList);
@@ -148,7 +148,6 @@ class AnnoationStarter implements EzStarter
             if (!$aspect->check()) {
                 continue;
             }
-            var_dump($aspect, get_parent_class($aspect));
             if ($aspect instanceof BuildAspect) {
                 $aspect->adhere();
             }
@@ -170,7 +169,7 @@ class AnnoationStarter implements EzStarter
         $v = $annoItem->getValue();
         DBC::assertNotEmpty($v->constStruct(), "[Gear] Anno $k Must Defined Const STRUCT!");
         $target = $v->constTarget();
-        if (EzDataUtils::isList($target)) {
+        if (EzCheckUtils::isList($target)) {
             DBC::assertTrue(in_array($annoItem->at, $target),
                 "[Gear] Anno $k Must Used At ".AnnoElementType::getDesc($target)."!");
         } else {

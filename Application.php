@@ -106,7 +106,7 @@ class Application
         }
         return $path;
     }
-    
+
     private function pathCheck($pathName, $path) {
         if (empty($path)) {
             exit("[error] The $pathName is empty!");
@@ -129,9 +129,9 @@ class Application
         $classes = array_keys($hash);
         Application::$context->setAppSourceClass($classes);
 
-        if (!empty($classess)) {
-            foreach($classess as $class) {
-                $this->createBean($class);
+        foreach($hash as $className => $classPath) {
+            if (is_subclass_of($className, EzBean::class)) {
+                $this->createBean($className);
             }
         }
     }
@@ -164,6 +164,10 @@ class Application
 
             if (is_subclass_of($className, EzStarter::class)) {
                 $this->starterRegisters[] = Clazz::get($className)->new();
+            }
+
+            if (is_subclass_of($className, EzBean::class)) {
+                $this->createBean($className);
             }
         }
         Application::$context->setGlobalComponentClass($classes);
@@ -304,20 +308,21 @@ class Application
          */
         foreach(BeanFinder::get()->getAll(DynamicProxy::class) as $objName => $obj) {
             $reflection = $obj->__CALL__getReflectionClass();
-            if(!$reflection->isSubclassOf(BaseController::class)) {
+            if(!$reflection->isSubclassOf("BaseController")) {
                 continue;
             }
             $reflectionMethods = $reflection->getMethods();
             foreach($reflectionMethods as $reflectionMethod) {
                 if(!$reflectionMethod->isPublic()
-                    || BaseController::class === $reflectionMethod->getDeclaringClass()->getName()){
+                    || "BaseController" === $reflectionMethod->getDeclaringClass()->getName()){
                     continue;
                 }
                 if (!$reflectionMethod->isUserDefined() || $reflectionMethod->isConstructor()) {
                     continue;
                 }
                 $defaultPath = $objName . '/' . $reflectionMethod->getName();
-                EzRouter::get()->setMapping($defaultPath, $reflection->getName(), $reflectionMethod->getName());
+                BeanFinder::get()->fetch(EzRouter::class)
+                    ->setMapping($defaultPath, $reflection->getName(), $reflectionMethod->getName());
             }
         }
     }

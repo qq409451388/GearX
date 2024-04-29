@@ -217,7 +217,7 @@ class AnnoationRule implements EzHelper
                 continue;
             }
             $content = "{".$matched['content']."}";
-            if (!EzDataUtils::isJson($content)) {
+            if (!EzCheckUtils::isJson($content)) {
                 Logger::warn("[Gear] Invalid Content AnnoInfo:{}, Content:{}", $annoName, $content);
                 continue;
             }
@@ -225,7 +225,7 @@ class AnnoationRule implements EzHelper
                 Logger::warn("[Gear] UnExpected AnnoInfo:{} ({})", $annoName, $content);
                 continue;
             }
-            $content = EzCollectionUtils::decodeJson($content);
+            $content = EzCodecUtils::decodeJson($content);
             $list[] = AnnoationElement::createComplex($annoName, $content, $at);
         }
         return $list;
@@ -271,7 +271,7 @@ class AnnoationRule implements EzHelper
          * @example: @XXX(a=>1, b=>2)
          */
         $s = "/\s?@(?<annoName>[a-zA-Z]+)\s(?<content>[\w(.*)\s]+)/";
-        $document = EzString::convertToUnicode($document);
+        $document = EzStringUtils::convertToUnicode($document);
         preg_match($s, $document, $matchedes);
         $s2 = "/(?<value>[a-zA-Z]+)?/";
         foreach ($matchedes as $matched) {
