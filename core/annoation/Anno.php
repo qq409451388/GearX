@@ -5,6 +5,7 @@
  */
 abstract class Anno
 {
+    protected $value;
     /**
      * 指定注解可以放置的位置（默认: 所有）@see AnnoElementType
      */

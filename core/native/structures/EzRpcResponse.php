@@ -7,7 +7,10 @@ class EzRpcResponse implements EzDataObject
     public $msg;
 
     private const OK = 0;
-    public const EMPTY_RESPONSE = EzString::EMPTY_JSON_OBJ;
+    public const EMPTY_RESPONSE = EzCodecUtils::EMPTY_JSON_OBJ;
+
+    public const SYSTEM_ERROR = 9999;
+    public static $codeMap = [];
 
     public function __construct($data = [], $errCode = 0, $msg = ""){
         $this->errCode = $errCode;
@@ -21,10 +24,10 @@ class EzRpcResponse implements EzDataObject
 
     public static function error($code, $msg = ""){
         if (Env::isProd()) {
-            return self::error(ErrorCode::SYSTEM_ERROR);
+            return self::error(self::SYSTEM_ERROR);
         }
-        if (empty($msg) && !empty(ErrorCode::$codeMap[$code])) {
-            return (new self(null, $code, ErrorCode::$codeMap[$code]));
+        if (empty($msg) && !empty(self::$codeMap[$code])) {
+            return (new self(null, $code, self::$codeMap[$code]));
         }
         return (new self(null, $code, $msg));
     }
@@ -33,7 +36,8 @@ class EzRpcResponse implements EzDataObject
         if (is_array($this->data) || is_object($this->data)) {
             $this->format($this->data);
         }
-        return EzString::encodeJson($this)??self::EMPTY_RESPONSE;
+        $this->data = EzObjectUtils::toString($this->data);
+        return EzCodecUtils::encodeJson($this)??self::EMPTY_RESPONSE;
     }
 
     private function format(&$data) {
@@ -47,6 +51,6 @@ class EzRpcResponse implements EzDataObject
     }
 
     public function toString () {
-        return EzDataUtils::toString(get_object_vars($this));
+        return EzObjectUtils::toString(get_object_vars($this));
     }
 }

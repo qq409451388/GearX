@@ -5,7 +5,7 @@ class EzCodecUtils
 
 
     public static function encodeJson($obj){
-        return json_encode($obj, JSON_UNESCAPED_SLASHES) ?? self::EMPTY_JSON_OBJ;
+        return json_encode($obj, JSON_UNESCAPED_UNICODE) ?? self::EMPTY_JSON_OBJ;
     }
 
     public static function decodeJson($json) {
