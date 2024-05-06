@@ -36,13 +36,6 @@ class Env
         return self::getEnv() == self::PROD;
     }
 
-    public static function getDomain(){
-        $schema = Config::get("schema");
-        $host = self::getIp();
-        $port = Config::get('port');
-        return $schema.'://'.$host.':'.$port.'/';
-    }
-
     public static function getIp(){
         $ipAddress = Config::get("ip");
         if (!empty($ipAddress) && "0.0.0.0" != $ipAddress) {
@@ -165,14 +158,6 @@ class Env
      */
     public static function setMemoryLimit(int $byte) {
         ini_set('memory_limit', $byte);
-    }
-
-    /**
-     * 是否使用带有匹配规则的路由
-     * @return true
-     */
-    public static function useFuzzyRouter() {
-        return Config::get("fuzzyrouter")??true;
     }
 
     public static function isConsole() {

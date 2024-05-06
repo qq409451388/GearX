@@ -104,7 +104,19 @@ class Config
     }
 
     public static function setOne($k, $v) {
-        self::$config[$k] = $v;
+        $arr = explode(self::KEY_SPLIT, $k);
+        $tmp = &self::$config;
+        $maxIndex = count($arr) - 1;
+        foreach ($arr as $index => $key) {
+            if ($index == $maxIndex) {
+                $tmp[$key] = $v;
+            } else {
+                if (!isset($tmp[$key])) {
+                    $tmp[$key] = []; // 确保创建不存在的中间数组
+                }
+                $tmp = &$tmp[$key];
+            }
+        }
     }
 
     public static function add($key, $item) {
@@ -116,5 +128,9 @@ class Config
             $list[] = $item;
             self::setOne($key, $list);
         }
+    }
+
+    public static function getAll() {
+        return self::$config;
     }
 }
