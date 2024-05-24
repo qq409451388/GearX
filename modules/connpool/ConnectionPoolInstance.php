@@ -10,9 +10,4 @@ class ConnectionPoolInstance implements EzDataObject
      * @var ConnectionPoolInstanceConfig $hook
      */
     public $hook;
-
-    /**
-     * @var Object
-     */
-    public $connection;
 }

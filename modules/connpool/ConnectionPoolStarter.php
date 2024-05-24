@@ -2,52 +2,55 @@
 
 class ConnectionPoolStarter implements EzStarter
 {
-    /**
-     * @var array<ConnectionPoolItemData>
-     */
-    private $connectionPool;
 
     public function init()
     {
-        $this->connectionPool = EzObjectUtils::createObjectList(Config::get("connectionPool"), ConnectionPoolItemData::class);
-        foreach ($this->connectionPool as $key => $connectionPoolItemData) {
+        $connectionPool = EzObjectUtils::createObjectList(Config::get("connectionPool"), ConnectionPoolItemData::class);
+        foreach ($connectionPool as $key => $connectionPoolItemData) {
             if (!DependencyCollector::hasModuel($connectionPoolItemData->module)) {
                 Logger::error("[ConnectionPool] Cannot Find module:{}, please check the configuration connectionPool!", $connectionPoolItemData->module);
-                unset($this->connectionPool[$key]);
+                unset($connectionPool[$key]);
                 continue;
             }
             if (empty($connectionPoolItemData->instances)) {
                 Logger::error("[ConnectionPool] Cannot Find instance, when load module {}, please check the configuration connectionPool!", $connectionPoolItemData->module);
-                unset($this->connectionPool[$key]);
+                unset($connectionPool[$key]);
                 continue;
             }
         }
+        ConnectionPool::setConfiguration($connectionPool);
     }
 
     public function start()
     {
-        foreach ($this->connectionPool as $index => $connectionPoolItemData) {
+        $connectionPoolInstanceObjects = [];
+        $connectionPool = ConnectionPool::getConfiguration();
+        foreach ($connectionPool as $index => $connectionPoolItemData) {
             $connectionPoolInstances = $connectionPoolItemData->instances;
             foreach ($connectionPoolInstances as $instanceIndex => $connectionPoolInstance) {
                 $connectionPoolInstanceConfig = $connectionPoolInstance->config;
                 try {
-                    $connectionPoolInstance->connection
-                        = Clazz::get($connectionPoolItemData->driver)->callStatic(
+                    $connection = Clazz::get($connectionPoolItemData->driver)->callStatic(
                         $connectionPoolInstanceConfig->getStartMethod(), $connectionPoolInstanceConfig->getArgs());
                     if ($connectionPoolInstance->hook instanceof ConnectionPoolInstanceConfig) {
                         $method = $connectionPoolInstance->hook->startMethod;
-                        call_user_func_array([$connectionPoolInstance->connection, $method], $connectionPoolInstance->hook->args);
+                        call_user_func_array([$connection, $method], $connectionPoolInstance->hook->args);
                     }
+                    $connectionPoolInstanceObjects[$connectionPoolItemData->driver][$instanceIndex] = $connection;
                 } catch (Exception|Error $e) {
                     unset($connectionPoolItemData->instances[$instanceIndex]);
+                    unset($connectionPoolInstanceObjects[$connectionPoolItemData->driver][$instanceIndex]);
                     Logger::error("[ConnectionPool Exception] Create Connection {}[{}] Failed! Caused by:{}",
                         $connectionPoolItemData->module, $instanceIndex, $e->getMessage());
                 }
             }
             if (empty($connectionPoolItemData->instances)) {
-                unset($this->connectionPool[$index]);
+                unset($connectionPool[$index]);
+                unset($connectionPoolInstanceObjects[$connectionPoolItemData->driver]);
                 Logger::error("[ConnectionPool] The module:{} Has No Instances!", $connectionPoolItemData->module);
             }
         }
+        ConnectionPool::setConfiguration($connectionPool);
+        ConnectionPool::setConnection($connectionPoolInstanceObjects);
     }
 }
