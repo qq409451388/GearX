@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * php ./init_dependency.php -i /Users/xxx/.ssh/github_rsa -r true -m ssh
+ */
 $gearPath = dirname(__FILE__, 2);
 $moduleInfo = json_decode(file_get_contents($gearPath . "/config/module_dependency.data"), true);
 $args = [];
