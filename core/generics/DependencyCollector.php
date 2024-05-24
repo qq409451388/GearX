@@ -58,4 +58,8 @@ class DependencyCollector {
         $classes = SysUtils::scanFile($path, -1, ["php"], true);
         return $classes;
     }
+
+    public static function hasModuel($moduleName):bool {
+        return in_array($moduleName, self::$cache) || in_array($moduleName, self::$cacheName);
+    }
 }

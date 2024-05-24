@@ -1,4 +1,6 @@
 <?php
-final class EzArray{
+final class EzArray extends EzObject {
+    public function __construct() {
 
+    }
 }

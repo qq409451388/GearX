@@ -1,5 +1,5 @@
 <?php
-class EzDate
+final class EzDate extends EzObject
 {
     private $timeStamp;
 
