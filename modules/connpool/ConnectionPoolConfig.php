@@ -1,7 +1,8 @@
 <?php
-class ConnectionPoolItemData implements EzDataObject {
+class ConnectionPoolConfig implements EzDataObject {
     public $module;
     public $driver;
+    public $aliveSeconds;
     /**
      * @var array<ConnectionPoolInstance>
      */

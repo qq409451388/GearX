@@ -1,7 +1,7 @@
 <?php
 class ConnectionPool implements EzComponent {
     /**
-     * @var array<ConnectionPoolItemData>
+     * @var array<ConnectionPoolConfig>
      */
     private static $connectionPool;
 
@@ -32,5 +32,9 @@ class ConnectionPool implements EzComponent {
 
     public static function setConnection($connectionList){
         return self::$connectionPoolInstances = $connectionList;
+    }
+
+    public static function getConnections($className){
+        return self::$connectionPoolInstances[$className] ?? [];
     }
 }
