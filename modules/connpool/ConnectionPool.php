@@ -21,9 +21,7 @@ class ConnectionPool implements EzComponent {
 
     public static function getInstance($className){
         $instances = self::$connectionPoolInstances[$className] ?? null;
-        if (empty($instances)) {
-            return null;
-        }
+        DBC::assertNotEmpty($instances, "[ConnectionPool] No Instances of $className", -1, GearNotFoundResourceException::class);
         $randomIndex = self::getIndexFromPool($className);
         return $instances[$randomIndex];
     }

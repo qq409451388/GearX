@@ -37,14 +37,6 @@ final class EzDate extends EzObject
         return $this->formatDate(self::FORMAT_DATETIME);
     }
 
-    /**
-     * @return false|string
-     * @deprecated
-     */
-    public function toString() {
-        return $this->formatDate(self::FORMAT_DATETIME);
-    }
-
     public function offsetDay(int $day)
     {
         $this->timeStamp += $day * self::DAY_SEC;
