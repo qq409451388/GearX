@@ -205,7 +205,7 @@ class DBC
         self::assertFalse(EzCheckUtils::isList($obj), $msg, $code, $clazz);
     }
 
-    public static function assertInRange(string $expect, int $actual, $msg, $code = 0, $clazz = GearRunTimeException::class) {
+    public static function assertInRange(string $expect, $actual, $msg, $code = 0, $clazz = GearRunTimeException::class) {
         $bounds = explode(',', trim($expect, '[]()'));
         if ($expect[0] == '[') {
             self::assertFalse($actual < $bounds[0], $msg, $code, $clazz);
