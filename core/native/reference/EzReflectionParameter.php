@@ -8,7 +8,7 @@ class EzReflectionParameter extends ReflectionParameter
         return is_subclass_of($this->getType()->getName(), $className);
     }
 
-    public function getDefaultValue() {
+    public function getDefaultValue():mixed {
         return $this->isDefaultValueAvailable() ? parent::getDefaultValue() : null;
     }
 }

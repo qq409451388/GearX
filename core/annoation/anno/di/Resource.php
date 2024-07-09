@@ -1,11 +1,7 @@
 <?php
-
-/**
- * degign for Object ? extends BaseDO
- */
-class ColumnAlias extends Anno
+class Resource extends Anno
 {
-    public function getColumn() {
+    public function getClassName() {
         return $this->value;
     }
 
@@ -26,6 +22,6 @@ class ColumnAlias extends Anno
 
     public static function constAspect()
     {
-        return null;
+        return DiAspect::class;
     }
 }

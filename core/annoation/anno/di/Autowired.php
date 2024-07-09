@@ -1,14 +1,13 @@
 <?php
-class RequestMapping extends Anno implements AnnoationCombination
+class Autowired extends Anno
 {
-
-    public function getPath() {
+    public function getClassName() {
         return $this->value;
     }
 
     public static function constTarget()
     {
-        return AnnoElementType::TYPE_METHOD;
+        return AnnoElementType::TYPE_FIELD;
     }
 
     public static function constPolicy()
@@ -23,11 +22,6 @@ class RequestMapping extends Anno implements AnnoationCombination
 
     public static function constAspect()
     {
-        return RouterAspect::class;
-    }
-
-    public static function constDepend()
-    {
-        return null;
+        return DiAspect::class;
     }
 }
