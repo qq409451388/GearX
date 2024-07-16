@@ -6,5 +6,13 @@
  */
 interface EzSerializeDataObject extends EzDataObject
 {
+    /**
+     * @return Clazz<Serializer>
+     */
+    public function getSerializeObj():Clazz;
 
+    /**
+     * @return Clazz<DeSerializer>
+     */
+    public function getDeserializeObj():Clazz;
 }

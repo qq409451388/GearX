@@ -1,5 +1,5 @@
 <?php
-final class EzDate extends EzObject
+final class EzDate extends EzObject implements EzSerializeDataObject
 {
     private $timeStamp;
 
@@ -20,6 +20,10 @@ final class EzDate extends EzObject
     public function __construct($timeStamp = null)
     {
         $this->timeStamp = is_null($timeStamp) ? time() : $timeStamp;
+    }
+
+    public static function newFromString($str) {
+        return new EzDate(strtotime($str));
     }
 
     public function formatDate($format)
@@ -63,6 +67,16 @@ final class EzDate extends EzObject
 
     public function __toString()
     {
-        return $this->toString();
+        return $this->datetimeString();
+    }
+
+    public function getSerializeObj(): Clazz
+    {
+        return Clazz::get(EzDateSerializer::class);
+    }
+
+    public function getDeserializeObj(): Clazz
+    {
+        return Clazz::get(EzDateDeserializer::class);
     }
 }

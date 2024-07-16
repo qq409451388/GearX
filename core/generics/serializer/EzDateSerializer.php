@@ -1,10 +1,10 @@
 <?php
 
-class EzDateSerializer extends Serializer
+class EzDateSerializer implements Serializer
 {
 
     public function serialize($data): string
     {
-        return strval($data);
+        return $data->datetimeString();
     }
 }

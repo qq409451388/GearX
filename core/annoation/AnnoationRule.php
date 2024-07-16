@@ -140,12 +140,12 @@ class AnnoationRule implements EzHelper
          * @example: @XXX(a=>1, b=>2)
          */
         //$s = "/\s?@(?<annoName>[a-zA-Z]+)\s?\((?<content>[\w\s=>\"\',]+)\)/";
-        $s = "/\s?@$annoName\s?\((?<content>[\w\s=>\"\',\%]+)\)/";
+        $s = "/\s?@$annoName\s?\((?<content>[\w\s=>\"\',\_\%]+)\)/";
         preg_match($s, $document, $matched);
         if (empty($matched)) {
             return null;
         }
-        $s2 = "/(?<key>[a-zA-Z]+)\s?=>\s?\"?(?<value>[\w\s\%]+)\"?/";
+        $s2 = "/(?<key>[a-zA-Z]+)\s?=>\s?\"?(?<value>[\w\s\_\%]+)\"?/";
         preg_match_all($s2, $matched['content'], $matchedes2, 2);
         if (empty($matchedes2)) {
             return null;

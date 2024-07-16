@@ -36,7 +36,7 @@ class EzRpcResponse implements EzDataObject
         if (is_array($this->data) || is_object($this->data)) {
             $this->format($this->data);
         }
-        $this->data = EzObjectUtils::toString($this->data);
+        $this->data = EzCodecUtils::encodeJson($this->data);
         return EzCodecUtils::encodeJson($this)??self::EMPTY_RESPONSE;
     }
 
