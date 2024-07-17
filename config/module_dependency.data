@@ -31,6 +31,10 @@
     {
         "name": "GearModule-Painter",
         "alias": "painter"
+    },
+    {
+        "name": "GearModule-ConnPool",
+        "alias": "connpool"
     }
   ]
 }
