@@ -123,6 +123,21 @@ class Application
         Application::$context->setGlobalCoreClass($classes);
     }
 
+    private function outputVersion() {
+        $bannerPath = Application::$context->getCorePath().DIRECTORY_SEPARATOR."generics".DIRECTORY_SEPARATOR."banner";
+        $files = SysUtils::scanFile($bannerPath);
+        $bannerFile = $files[mt_rand(0, count($files) - 1)];
+
+        $versionInfo = file_get_contents( Application::$context->getGearPath().DIRECTORY_SEPARATOR."gearx.version");
+        $versionInfo = trim($versionInfo);
+        echo PHP_EOL;
+        print_r(file_get_contents($bannerFile));
+        usleep(200000);
+        echo PHP_EOL;
+        Logger::info("[:::GearX:::] version:{}", $versionInfo);
+        usleep(500000);
+    }
+
     protected function loadAppContainer() {
         $hash = $this->getFilePaths(Application::$context->getAppSourceClassPath());
         $this->register($hash);
@@ -368,6 +383,7 @@ class Application
         // for Logger
         Env::setRunModeScript();
         Config::init();
+        $app->outputVersion();
         $app->loadModulePackages();
         return $app;
     }
@@ -388,6 +404,7 @@ class Application
         $app->loadCore();
         Env::setRunModeConsole();
         Config::init();
+        $app->outputVersion();
         $app->loadModulePackagesAndRegister();
         $app->loadAppContainer();
         $app->startRegister();
