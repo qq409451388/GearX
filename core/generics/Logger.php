@@ -41,12 +41,13 @@ class Logger
         if (Env::isWin()) {
             echo "[".date("Y-m-d H:i:s")."]".$msg.PHP_EOL;
         } else {
-            list($preClassField, $msg) = self::splitString($msg);
+            self::info($msg);
+            /*list($preClassField, $msg) = self::splitString($msg);
             $strings = [
                 [$preClassField, "cyan"],
                 [$msg, "black"]
             ];
-            self::consolePlus($strings);
+            self::consolePlus($strings);*/
         }
    }
 
@@ -55,6 +56,7 @@ class Logger
      * @return void
      */
     public static function consolePlus($strings) {
+        array_unshift($strings, ["  "]);
         array_unshift($strings, [date("Y-m-d H:i:s"), "light_gray"]);
         foreach ($strings as $string) {
             self::consoleColor($string[0], $string[1]??null, $string[2]??null);

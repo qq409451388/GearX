@@ -136,6 +136,8 @@ class Application
         echo PHP_EOL;
         Logger::info("[:::GearX:::] version:{}", $versionInfo);
         usleep(500000);
+        echo "============================Loading Framework===================================";
+        echo PHP_EOL;
     }
 
     protected function loadAppContainer() {
