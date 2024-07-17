@@ -16,6 +16,7 @@ class Config
         // always at first
         self::initSystemConfig();
         self::initStaticConfig();
+        Logger::info("[Configuration] active env:{}", self::get("application.env"));
     }
 
 

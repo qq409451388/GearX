@@ -17,8 +17,7 @@ class Logger
         $res = self::matchTemplate($template, $args);
         if(Env::isScript() || Env::isDev()){
             self::console($res);
-        }
-        if (Env::isConsole()) {
+        } else {
             self::write($res, self::TYPE_RECORD);
         }
     }
