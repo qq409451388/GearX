@@ -84,15 +84,16 @@ class Logger
 
     public static function info($template, ...$args)
     {
-        if(Env::isScript() || Env::isDev()){
-            list($preClassField, $template) = self::splitString($template);
-            $strings = [
-                ['[INFO]', "green"],
-                [$preClassField, "cyan"],
-                [self::matchTemplate($template, $args), "black"]
-            ];
-            self::consolePlus($strings);
-        } else {
+
+        list($preClassField, $template) = self::splitString($template);
+        $strings = [
+            ['[INFO]', "green"],
+            [$preClassField, "cyan"],
+            [self::matchTemplate($template, $args), "black"]
+        ];
+        self::consolePlus($strings);
+
+        if (Env::isProd()) {
             self::write("[INFO]".self::matchTemplate($template, $args), self::TYPE_RECORD);
         }
     }
@@ -100,15 +101,16 @@ class Logger
     public static function warn($template, ...$args)
     {
         self::logException($args);
-        if (Env::isScript() || Env::isDev()) {
-            list($preClassField, $template) = self::splitString($template);
-            $strings = [
-                ['[WARN]', "yellow"],
-                [$preClassField, "cyan"],
-                [self::matchTemplate($template, $args), "black"]
-            ];
-            self::consolePlus($strings);
-        } else {
+
+        list($preClassField, $template) = self::splitString($template);
+        $strings = [
+            ['[WARN]', "yellow"],
+            [$preClassField, "cyan"],
+            [self::matchTemplate($template, $args), "black"]
+        ];
+        self::consolePlus($strings);
+
+        if (Env::isProd()) {
             self::write("[WARN]".self::matchTemplate($template, $args), self::TYPE_RECORD, date('Y-m-d')."_warn");
         }
     }
@@ -116,15 +118,15 @@ class Logger
     public static function error($template, ...$args)
     {
         self::logException($args);
-        if (Env::isScript() || Env::isDev()) {
-            list($preClassField, $template) = self::splitString($template);
-            $strings = [
-                ['[ERROR]', "red"],
-                [$preClassField, "cyan"],
-                [self::matchTemplate($template, $args), "black"]
-            ];
-            self::consolePlus($strings);
-        } else {
+        list($preClassField, $template) = self::splitString($template);
+        $strings = [
+            ['[ERROR]', "red"],
+            [$preClassField, "cyan"],
+            [self::matchTemplate($template, $args), "black"]
+        ];
+        self::consolePlus($strings);
+
+        if (Env::isProd()) {
             self::write("[ERROR]".self::matchTemplate($template, $args), self::TYPE_RECORD, date('Y-m-d')."_error");
         }
     }
