@@ -6,6 +6,9 @@
 abstract class Anno
 {
     protected $value;
+
+    protected $order = 99;
+
     /**
      * 指定注解可以放置的位置（默认: 所有）@see AnnoElementType
      */
@@ -45,7 +48,7 @@ abstract class Anno
      * @return int 注解优先级，越大越先执行
      */
     public function getOrder() {
-        return 0;
+        return $this->order;
     }
 
     public function __get($name) {

@@ -97,7 +97,7 @@ class DynamicProxy
             $this->callBefore[$targetFunc] = [];
         }
         $this->callBefore[$targetFunc][] = RunTimeFunction::create($targetFunc, $anonyId, $anony, $order, $after);
-        $this->__CALL__reOrder($this->callAfter);
+        $this->__CALL__reOrder($this->callBefore);
     }
 
     public function __CALL__registeAfter($targetFunc, $anonyId, Closure $anony, $order = 0, $after = null){
@@ -134,9 +134,17 @@ class DynamicProxy
         }
     }
 
-    // todo order
-    private function __CALL__reOrder($runtimeItemList) {
-        //var_dump($runtimeItemList);
+    /**
+     * @param array<string, array<RunTimeFunction>>$runtimeItemList
+     * @return void
+     */
+    private function __CALL__reOrder(&$runtimeItemList) {
+        foreach ($runtimeItemList as $funcName => &$runtimeItemListChildren) {
+            $orderd = array_column($runtimeItemListChildren, "order", "anonymousId");
+            asort($orderd);
+            $runtimeItemListChildren = array_column($runtimeItemListChildren, null, "anonymousId");
+            $runtimeItemListChildren = EzCollectionUtils::matchKeys(array_keys($orderd), $runtimeItemListChildren);
+        }
     }
 
     public function addContextInstance($ins) {

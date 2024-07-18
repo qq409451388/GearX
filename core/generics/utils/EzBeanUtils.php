@@ -8,12 +8,15 @@ class EzBeanUtils
      * @return DynamicProxy<$className>
      */
     public static function createBean(string $className, $isDeep = false) {
+        if (interface_exists($className)) {
+           return null;
+        }
         DBC::assertTrue(class_exists($className), "[EzObject] ClassName $className is not found!",
             0, GearIllegalArgumentException::class);
         DBC::assertTrue(is_subclass_of($className, EzBean::class), "[EzObject] Class Must implements EzBean, But {$className}!",
             0, GearIllegalArgumentException::class);
         $refClass = new EzReflectionClass($className);
-        if ($refClass->isAbstract()) {
+        if ($refClass->isAbstract() || $refClass->isInterface()) {
             return null;
         }
         $class = BeanFinder::get()->pull($className);
