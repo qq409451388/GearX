@@ -79,4 +79,12 @@ final class EzDate extends EzObject implements EzSerializeDataObject
     {
         return Clazz::get(EzDateDeserializer::class);
     }
+
+    public function afterNow() {
+        return $this->timeStamp > time();
+    }
+
+    public function beforeNow() {
+        return $this->timeStamp < time();
+    }
 }
