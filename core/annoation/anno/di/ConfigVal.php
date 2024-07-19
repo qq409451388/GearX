@@ -1,5 +1,5 @@
 <?php
-class Transaction extends Anno
+class ConfigVal extends Anno
 {
 
     /**
@@ -7,7 +7,7 @@ class Transaction extends Anno
      */
     public static function constTarget()
     {
-        return AnnoElementType::TYPE_METHOD;
+        return AnnoElementType::TYPE_FIELD;
     }
 
     /**
@@ -15,7 +15,7 @@ class Transaction extends Anno
      */
     public static function constPolicy()
     {
-        return AnnoPolicyEnum::POLICY_ACTIVE;
+        return AnnoPolicyEnum::POLICY_BUILD;
     }
 
     /**
@@ -23,7 +23,7 @@ class Transaction extends Anno
      */
     public static function constStruct()
     {
-        return AnnoValueTypeEnum::TYPE_LITE;
+        return AnnoValueTypeEnum::TYPE_NORMAL;
     }
 
     /**
@@ -32,6 +32,6 @@ class Transaction extends Anno
      */
     public static function constAspect()
     {
-        return null;
+        return DiAspect::class;
     }
 }

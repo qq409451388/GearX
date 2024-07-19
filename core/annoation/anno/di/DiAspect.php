@@ -41,5 +41,13 @@ class DiAspect extends Aspect implements BuildAspect
             $this->getAtProperty()->setValue($classObj, $object);
             $this->getAtProperty()->setAccessible(false);
         }
+        if (ConfigVal::class == $this->getAnnoName()) {
+            $classObj = BeanFinder::get()->pull($this->getAtClass()->getName());
+            $configValue = $this->getValue()->value;
+            $this->getAtProperty()->setAccessible(true);
+            $this->getAtProperty()->setValue($classObj->__CALL__getSourceObj(), Config::get($configValue));
+            $this->getAtProperty()->setAccessible(false);
+        }
+
     }
 }
