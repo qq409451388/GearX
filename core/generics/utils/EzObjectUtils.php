@@ -213,6 +213,7 @@ class EzObjectUtils
                 $refProperty = $refClass->getProperty($key);
             }catch (ReflectionException $reflectionException) {
                 $refProperty = null;
+                Logger::error("[EzObjectUtils] getProperty Fail! from Class:{}, key:{}", $className, $key, $reflectionException);
             }
             if (!$class instanceof EzIgnoreUnknow) {
                 DBC::assertNonNull($refProperty, "[EzObject] PropertyName $key is not found From Class $className!",
