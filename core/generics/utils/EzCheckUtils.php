@@ -24,7 +24,7 @@ class EzCheckUtils
     public static function argsCheck(...$args)
     {
         foreach ($args as $arg) {
-            if (empty($arg) || (is_numeric($arg) && 0 > $arg)) {
+            if ((!is_numeric($arg) && empty($arg)) || (is_numeric($arg) && 0 > $arg)) {
                 return false;
             }
         }

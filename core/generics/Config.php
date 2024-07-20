@@ -64,15 +64,42 @@ class Config
             "[Config] The specified path for CONFIG_PATH <$configPath> does not exist. Please ensure that the path is correct and try again.",
             0, GearShutDownException::class);
         $pjs = SysUtils::scanFile($configPath, -1, [self::EXT_JSON], true);
+        $applicationConfig = [];
         foreach ($pjs as $key => $pj) {
             if (!is_file($pj)) {
                 return null;
+            }
+            if ((new EzString($key))->startsWith("application")) {
+                $applicationConfig[$key] = $pj;
+                continue;
             }
             $content = file_get_contents($pj);
             if(!empty($content) && $decodedObj = EzCodecUtils::decodeJson($content)){
                 self::setFromFile($key, $decodedObj);
             }
         }
+
+        if (!empty($applicationConfig)) {
+            // refresh application
+            $env = null;
+            $applicationConfigObject = [];
+            if (isset($applicationConfig['application'])) {
+                $json = file_get_contents($applicationConfig['application']);
+                $applicationConfigObject = EzCodecUtils::decodeJson($json);
+                $env = $applicationConfigObject['env'];
+            }
+            DBC::assertNotEmpty($env, "[Config] The Env must be specified at Config File application.");
+            $applicationInstanceKey = "application.$env";
+            if (isset($applicationConfig[$applicationInstanceKey])) {
+                $json = file_get_contents($applicationConfig[$applicationInstanceKey]);
+                $tmp = EzCodecUtils::decodeJson($json);
+                foreach ($tmp as $key => $value) {
+                    $applicationConfigObject[$key] = $value;
+                }
+            }
+            self::setFromFile('application', $applicationConfigObject);
+        }
+
     }
 
     private static function setFromFile($key, $data) {
