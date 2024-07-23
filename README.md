@@ -1,12 +1,12 @@
 # 使用说明文档（ver 2.1.9）
 
 ## 1.使用须知
-> 开发环境 PHP 7.3.24,
+> 开发环境 PHP 8.1,
 > 暂不保证老版本完美运行
 
 ## 2.初始化工作
 + 配置autoload文件
-   + 复制gear根目录下的autoload_example文件到与gear同级，重命名为autoload.php
+   + 复制Gear根目录下的autoload_example.php文件到与gear同级，重命名为autoload.php
    + 编辑文件内容，参考example文件
    + 以脚本运行，直接include autoload.php文件即可 
    + 至此即可使用此框架的各项功能

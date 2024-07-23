@@ -73,12 +73,12 @@ class Env
     }
 
     private static function getEnv(){
-        return strtoupper(Config::get("application.env"));
+        return strtoupper(Config::get("application.env")??"");
     }
 
     public static function staticPath(){
         #DBC::assertTrue(@defined("STATIC_PATH"), "静态文件路径未设置");
-        return defined("STATIC_PATH") ? STATIC_PATH : "";
+        return Config::get("application.static_path");
     }
 
     /**
@@ -223,6 +223,11 @@ class Env
             return str_replace("~/", $home."/", $path);
         }
         return $path;
+    }
+
+    public static function getDomain()
+    {
+        return Config::get("application.domain");
     }
 
 }

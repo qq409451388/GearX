@@ -1,0 +1,18 @@
+<?php
+/**
+ * 功能：框架类启动器
+ * 首次使用：将此文件改名为.php文件
+ */
+include(dirname(__FILE__, 3)."/GearX/Application.php");
+
+/**
+ * 配置绝对路径到启动参数
+ * args:
+ * -PappPath=project
+ * -PgearPath=xxx
+ * -PconfigPath=xxx
+ */
+Application::loadWebServer($argv);
+
+// 如果想启动一个web容器
+(new EzHttp("", 0))->start();

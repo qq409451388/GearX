@@ -446,6 +446,8 @@ class ApplicationContext {
     private $appSourceClass = [];
     private $configuration = null;
 
+    private $env = null;
+
     public function __construct($args = []) {
         foreach ($args as $arg) {
             // 匹配 -PA<Key>=[<Value1>,<Value2>,...] 列表格式
@@ -594,5 +596,21 @@ class ApplicationContext {
 
     public function setAppSourceClass($appSourceClass): void {
         $this->appSourceClass = $appSourceClass;
+    }
+
+    /**
+     * @return null
+     */
+    public function getEnv()
+    {
+        return $this->env;
+    }
+
+    /**
+     * @param null $env
+     */
+    public function setEnv($env): void
+    {
+        $this->env = $env;
     }
 }

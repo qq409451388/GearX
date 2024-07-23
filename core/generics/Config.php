@@ -88,6 +88,12 @@ class Config
                 $applicationConfigObject = EzCodecUtils::decodeJson($json);
                 $env = $applicationConfigObject['env'];
             }
+            if (defined("ENV")) {
+                $env = ENV;
+            }
+            if (!empty(Application::getContext()->getEnv())) {
+                $env = Application::getContext()->getEnv();
+            }
             DBC::assertNotEmpty($env, "[Config] The Env must be specified at Config File application.");
             $applicationInstanceKey = "application.$env";
             if (isset($applicationConfig[$applicationInstanceKey])) {
@@ -96,6 +102,8 @@ class Config
                 foreach ($tmp as $key => $value) {
                     $applicationConfigObject[$key] = $value;
                 }
+            } else {
+                Logger::warn("[Config] The env was set to {}, but no application.{} configuration was found, using the default configuration instead.", $env, $env);
             }
             self::setFromFile('application', $applicationConfigObject);
         }
