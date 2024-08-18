@@ -386,7 +386,7 @@ class Application
         Env::setRunModeScript();
         Config::init();
         $app->outputVersion();
-        $app->loadModulePackages();
+        $app->loadModulePackagesAndRegister();
         return $app;
     }
 
