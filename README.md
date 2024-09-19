@@ -1,29 +1,69 @@
-# 使用说明文档（ver 2.1.9）
+# GearX简介
+> GearX是一款纯PHP实现的轻量化的开发框架，
+> 旨在提供快速且舒适的方式开发项目，
+> 尤其是对于有过Java开发经验的开发者而言
+> <br/>
+> <br/>
+> **设计文档：**[点击跳转](./DESIGN.md)
+> <br/>
+> **变更文档：**[点击跳转](./CHANGELIST.md)
+> <br/>
+> **开源许可：**[点击跳转](./LICENSE)
 
-## 1.使用须知
-> 开发环境 PHP 8.1,
-> 暂不保证老版本完美运行
+# 特性&能力
+1. 框架完全由PHP实现，包括项目开发中的常用功能，并可以按需获取引入，以下是部分Module
+   1. **GearModule-DB[[点击跳转]](https://github.com/qq409451388/GearModule-DB)** 数据库的查询组件，简化了大量操作，支持常见的数据库协议
+   2. **GearModule-ORM[[点击跳转]](https://github.com/qq409451388/GearModule-ORM)** ORM组件，对于Java Web开发来说必然倍感亲切
+   3. **GearModule-EzCache[[点击跳转]](https://github.com/qq409451388/GearModule-EzCache)** 缓存组件，基于PHP socket模块实现了Redis的服务端和客户端，也包括基于内存或文件实现的本地缓存
+   4. **GearModule-EzCurl[[点击跳转]](https://github.com/qq409451388/GearModule-EzCurl)** 基于curl实现的web请求工具
+   5. **GearModule-Web[[点击跳转]](https://github.com/qq409451388/GearModule-Web)** 网络组件，支持多种协议
+2. 支持多种启动模式：Web服务启动、脚本模式启动、定时任务模式启动 
+3. Web服务使用常驻内存的方式，一次启动，多次复用
+4. 内置了注解功能，除了常用的注解外，支持开发者自定义注解
 
-## 2.初始化工作
-+ 配置autoload文件
-   + 复制Gear根目录下的autoload_example.php文件到与gear同级，重命名为autoload.php
-   + 编辑文件内容，参考example文件
-   + 以脚本运行，直接include autoload.php文件即可 
-   + 至此即可使用此框架的各项功能
-+ 【可选】DB工具需要配置/gear/config目录下dbcon.json、syshash.json
-+ 【可选】redis工具需要配置/gear/config目录下rediscluster.json
-+ 【可选】mail工具需要配置/gear/config目录下mail.json
-+ 【可选】微信工具人需要配置/gear/config目录下wechatrobot.json
+# 快速开始
+## 1. 运行环境
+> PHP 7.4+ (推荐8.1+)
+## 2. 开发环境
+> **Lan**: 初期 PHP 7.4，一些模块组件基于 PHP 8.1
+> <br/>
+> **OS**: MacOS
+> <br/>
+> **IDE**：PhpStorm
+## 3.初始化工作
+> 假设我们使用Linux系统进行搭建，项目目录统一放在了/home/release/
 
+### 3.1. 将框架代码拉取到任意目录，这里以/home/release举例
+```bash
+  cd /home/release/ && git clone https://github.com/qq409451388/GearX
+```
+### 3.2. 安装Module
+#### \>\>\>\> 3.2.1 使用Https的方式安装
+```bash
+  php /home/release/GearX/bin/init_dependency.php -r true -m https
+```
+#### \>\>\>\> 3.2.2 使用SSH的方式安装
+###### 如果您的git版本过高，可以使用ssh的方式拉取项目依赖,那么命令如下：
+```bash
+  php /home/release/GearX/bin/init_dependency.php -r true -m ssh
+```
+###### 可以传入参数 -i 指定本地证书
+```bash
+  php /home/release/GearX/bin/init_dependency.php -r true -m ssh -i /.ssh/github_rsa
+```
 
-## 3.功能介绍
-### 3.1 数据库查询工具 DB [[点击跳转](https://github.com/qq409451388/Gear/blob/main/modules/db/README.md)]
-### 3.2 基于php-curl的HTTP工具 EzCurl [[点击跳转](https://github.com/qq409451388/Gear/blob/main/modules/untils/README.md)]
-### 3.3 Redis操作类 EzRedis [[点击跳转](https://github.com/qq409451388/Gear/blob/main/modules/ezcache/README.md)]
-### 3.4 数据流处理工具 DataFilter [[点击跳转](https://github.com/qq409451388/Gear/blob/main/modules/datastream/README.md)]
-## 4.TODO List
-### Mapping支持Restful风格
-### 支持runSchduleTask，思路：使用子任务或者单独的进程去管理，需要进程间通信
-### 支持配置中心C、S
-### 支持注册中心C、S
-### 文档更新，注解工具的使用方式介绍
+### 3.3. 将示例项目代码拉取到任意目录，这里以/home/release举例
+```bash
+  cd /home/release/ && git clone https://github.com/qq409451388/GearXExample
+```
+### 3.4 启动服务
+```bash
+  php http_server.php -PappPath=/home/release/GearXExample -PgearPath=/home/release/GearX -PconfigPath=/home/release/GearXExample/config
+```
+### 3.5 访问服务
+浏览器打开 http://127.0.0.1:8888/test/helloworld
+
++ 【可选】DB工具需要配置config目录下dbcon.json、syshash.json
++ 【可选】redis工具需要配置config目录下rediscluster.json
++ 【可选】mail工具需要配置config目录下mail.json
++ 【可选】微信工具人需要配置config目录下wechatrobot.json
