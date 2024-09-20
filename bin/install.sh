@@ -27,7 +27,7 @@ install_path="${install_path:-/home/release}"
 install_path="${install_path%/}"
 
 # 定义目录路径
-GEARX_PATH="$install_path/GearX"
+GEARX_PATH="$SCRIPT_DIR/.."
 EXAMPLE_PATH="$install_path/GearXExample"
 SSH_KEY_PATH="$HOME/.ssh/github_rsa"
 
@@ -45,6 +45,7 @@ if [[ ! -d "$install_path" ]]; then
     fi
     print_success "$MSG_INSTALL_DIR_CREATED $install_path"
 fi
+
 
 # 3.2. 安装 Module
 print_info "$MSG_CHOOSE_INSTALL_METHOD"
