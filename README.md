@@ -163,7 +163,6 @@ curl http://127.0.0.1:8888/test/helloworld && echo ''
 
 ## 5. 其他 / Additional Information
 + **【可选 / Optional】DB 工具需要配置 config 目录下的 dbcon.json、syshash.json**
-<br/>
 <i>DB tools require configuration in config directory: dbcon.json, syshash.json</i>
 
 + **【可选 / Optional】Redis 工具需要配置 config 目录下的 rediscluster.json**
