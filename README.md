@@ -18,7 +18,7 @@
 ![Feature](https://img.shields.io/badge/Feature-自定义注解-fe7d37?style=flat-square)
 
 1. **框架完全由PHP实现 / Fully Implemented in PHP**
-   - 包括项目开发中的常用功能，并可以按需获取引入，以下是部分模块：<i>Includes common functions in project development, and can be introduced as needed. Here are some modules:<i>
+   - 包括项目开发中的常用功能，并可以按需获取引入，以下是部分模块：<i>Includes common functions in project development, and can be introduced as needed. Here are some modules:</i>
       1. **GearModule-DB**: [点击跳转 / Click Here](https://github.com/qq409451388/GearModule-DB) - 数据库的查询组件，简化了大量操作，支持常见的数据库协议。
       2. **GearModule-ORM**: [点击跳转 / Click Here](https://github.com/qq409451388/GearModule-ORM) - ORM组件，对于Java Web开发来说必然倍感亲切。
       3. **GearModule-EzCache**: [点击跳转 / Click Here](https://github.com/qq409451388/GearModule-EzCache) - 缓存组件，基于PHP socket模块实现了Redis的服务端和客户端，也包括基于内存或文件实现的本地缓存。
