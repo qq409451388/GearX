@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# 获取当前脚本所在目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # 引入库文件
-source ./repository/base_func.sh
-source ./repository/language.sh
+source "$SCRIPT_DIR/repository/base_func.sh"
+source "$SCRIPT_DIR/repository/language.sh"
 
 # 输出脚本版本
 print_info "$VERSION_MSG"
