@@ -13,6 +13,7 @@
 
 # 特性&能力 / Features & Capabilities
 
+![Feature](https://img.shields.io/badge/Feature-开箱即用-007ec6?style=flat-square)
 ![Feature](https://img.shields.io/badge/Feature-PHP%20Implemented%20Only-44cc11?style=flat-square)
 ![Feature](https://img.shields.io/badge/Feature-常驻内存-e05d44?style=flat-square)
 ![Feature](https://img.shields.io/badge/Feature-自定义注解-fe7d37?style=flat-square)
