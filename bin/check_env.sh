@@ -45,22 +45,17 @@ PHP_VERSION=$(php -r "echo PHP_VERSION;")
 PHP_MAJOR_VERSION=$(echo "$PHP_VERSION" | cut -d '-' -f 1)
 
 # 使用 sort -V 进行版本比较
-if [[ "$(printf '%s\n' "7.4" "$PHP_MAJOR_VERSION" | sort -V | head -n1)" == "7.4" && "$PHP_MAJOR_VERSION" != "7.4" ]]; then
+if [[ "$(printf '%s\n' "8.1" "$PHP_MAJOR_VERSION" | sort -V | head -n1)" == "8.1" && "$PHP_MAJOR_VERSION" != "8.1" ]]; then
+    print_success "$PHP_VERSION_SUCCESS_MSG"
+elif [[ "$(printf '%s\n' "7.4" "$PHP_MAJOR_VERSION" | sort -V | head -n1)" == "7.4" && "$PHP_MAJOR_VERSION" != "7.4" ]]; then
     print_warning "$PHP_VERSION_WARNING_MSG"
 fi
 
-if [[ "$(printf '%s\n' "8.1" "$PHP_MAJOR_VERSION" | sort -V | head -n1)" == "8.1" && "$PHP_MAJOR_VERSION" != "8.1" ]]; then
-    print_success "$PHP_VERSION_SUCCESS_MSG"
-fi
-
 # 检查 PHP 必须组件
-MISSING_COMPONENTS=()
 for component in curl pdo mysqli openssl sockets json pdo_mysql libxml mbstring; do
-    if ! php -m | grep -q "$component"; then
-        if [ $component -eq 0 ]; then
-            print_success "$PHP_COMPONENTS_SUCCESS_MSG $component"
-        else
-            print_error "$PHP_COMPONENTS_ERROR_MSG $component"
-        fi
+    if php -m | grep -q "$component"; then
+        print_success "Component $component is installed."
+    else
+        print_error "Component $component is missing."
     fi
 done
