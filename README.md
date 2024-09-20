@@ -58,12 +58,71 @@
 ```
 ### 3.4 启动服务
 ```bash
-  php http_server.php -PappPath=/home/release/GearXExample -PgearPath=/home/release/GearX -PconfigPath=/home/release/GearXExample/config
+  php /home/release/GearXExample/scripts/http_server.php -PappPath=/home/release/GearXExample -PgearPath=/home/release/GearX -PconfigPath=/home/release/GearXExample/config
 ```
 ### 3.5 访问服务
-浏览器打开 http://127.0.0.1:8888/test/helloworld
+```bash
+  curl http://127.0.0.1:8888/test/helloworld && echo ''
+```
+看到正常输出 hello world! 说明项目部署完成
 
 + 【可选】DB工具需要配置config目录下dbcon.json、syshash.json
 + 【可选】redis工具需要配置config目录下rediscluster.json
 + 【可选】mail工具需要配置config目录下mail.json
 + 【可选】微信工具人需要配置config目录下wechatrobot.json
+
+#### 启动日志
+```zsh
+guohan@ubuntu:/home/release# php /home/release/GearXExample/scripts/http_server.php -PappPath=/home/release/GearXExample -PgearPath=/home/release/GearX -PconfigPath=/home/release/GearXExample/config
+2024-09-20 14:32:26  [INFO][Configuration] active env:dev
+
+ ___                       _    _ 
+(  _`\                    ( )  ( )
+| ( (_)   __     _ _  _ __`\`\/'/'
+| |___  /'__`\ /'_` )( '__) >  <  
+| (_, )(  ___/( (_| || |   /'/\`\ 
+(____/'`\____)`\__,_)(_)  (_)  (_)
+
+2024-09-20 14:32:26  [INFO][:::GearX:::] version:RELEASE 2.5 (Last Update 2024-09-01)
+============================Loading Framework===================================
+2024-09-20 14:32:27  [INFO][Application] Start Searching modules...
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [ezcurl] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: ezcurl
+2024-09-20 14:32:27  [INFO][Application] No subdependencies found.
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [orm] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: orm
+2024-09-20 14:32:27  [INFO][Application] Subdependencies found, Extra Searching subdependencies...
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [orm->db] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: orm->db
+2024-09-20 14:32:27  [INFO][Application] Subdependencies found, Extra Searching subdependencies...
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [orm->db->ezcache] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: orm->db->ezcache
+2024-09-20 14:32:27  [INFO][Application] Subdependencies found, Extra Searching subdependencies...
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [orm->db->ezcache->web] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: orm->db->ezcache->web
+2024-09-20 14:32:27  [INFO][Application] No subdependencies found.
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [orm->ezcache] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: orm->ezcache
+2024-09-20 14:32:27  [INFO][Dependency] The module ezcache has been loaded!
+2024-09-20 14:32:27  [INFO][Application] No subdependencies found.
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [db] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: db
+2024-09-20 14:32:27  [INFO][Dependency] The module db has been loaded!
+2024-09-20 14:32:27  [INFO][Application] No subdependencies found.
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [utils] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: utils
+2024-09-20 14:32:27  [INFO][Application] No subdependencies found.
+2024-09-20 14:32:27  [INFO][Application] >>>>>> Import module: [web] <<<<<<
+2024-09-20 14:32:27  [INFO][Application] Analyse sub module: web
+2024-09-20 14:32:27  [INFO][Dependency] The module web has been loaded!
+2024-09-20 14:32:27  [INFO][Application] No subdependencies found.
+2024-09-20 14:32:27  [INFO][Gear]Create Bean BaseController
+2024-09-20 14:32:27  [INFO][Gear]Create Bean EzRouter
+2024-09-20 14:32:27  [INFO][Gear]Create Bean TestController
+2024-09-20 14:32:27  [INFO][Application] Start Register...
+2024-09-20 14:32:27  [INFO][Application] Init Third StartRegister AnnoationStarter
+2024-09-20 14:32:27  [INFO][EzRouter] Mapping Path [GET]test/helloworld To hello@TestController
+2024-09-20 14:32:27  [INFO][Application] Inited AnnoationStarter StartRegister Success!
+2024-09-20 14:32:27  [INFO][HTTP]Start HTTP Server...
+2024-09-20 14:32:27  [INFO]Start Server Success! http://127.0.0.1:8888
+```

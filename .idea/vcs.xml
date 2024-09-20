@@ -2,13 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/modules/connpool" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/modules/db" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/modules/ezcache" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/modules/ezcurl" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/modules/orm" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/modules/painter" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/modules/utils" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/modules/web" vcs="Git" />
   </component>
 </project>
