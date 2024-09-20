@@ -1,7 +1,7 @@
 # GearX简介 / GearX Introduction
 
-![GitHub](https://img.shields.io/badge/github-GearX-007ec6?style=flat-square)
-![Version](https://img.shields.io/badge/version-beta%200.2.5-fe7d37?style=flat-square)
+![GitHub](https://img.shields.io/badge/Github-GearX-007ec6?style=flat-square)
+![Version](https://img.shields.io/badge/Version-Beta%20v0.2.5-fe7d37?style=flat-square)
 
 > GearX是一款纯PHP实现的轻量化的开发框架，旨在提供快速且舒适的方式开发项目，尤其是对于有过Java开发经验的开发者而言。
 >
@@ -13,9 +13,9 @@
 
 # 特性&能力 / Features & Capabilities
 
-![Feature](https://img.shields.io/badge/特性-PHP%20Implemented-44cc11?style=flat-square)
-![Feature](https://img.shields.io/badge/特性-常驻内存-e05d44?style=flat-square)
-![Feature](https://img.shields.io/badge/特性-自定义注解-fe7d37?style=flat-square)
+![Feature](https://img.shields.io/badge/Feature-PHP%20Implemented%20Only-44cc11?style=flat-square)
+![Feature](https://img.shields.io/badge/Feature-常驻内存-e05d44?style=flat-square)
+![Feature](https://img.shields.io/badge/Feature-自定义注解-fe7d37?style=flat-square)
 
 1. **框架完全由PHP实现 / Fully Implemented in PHP**
    - 包括项目开发中的常用功能，并可以按需获取引入，以下是部分模块：
@@ -42,11 +42,11 @@
 
 ## 1. 运行环境 / Runtime Environment
 
-![PHP](https://img.shields.io/badge/PHP-8.1+-44cc11?style=flat-square)
-![PHP](https://img.shields.io/badge/PHP-7.4+-dfb317?style=flat-square)
+![PHP](https://img.shields.io/badge/PHP-8.1+(passed)-44cc11?style=flat-square)
+![PHP](https://img.shields.io/badge/PHP-7.4+(minor%20issues)-dfb317?style=flat-square)
 
 > PHP 7.4+ (推荐8.1+)  
-> PHP 需要开启常用自带模块：
+> PHP 需要开启常用自带模块：curl pdo mysqli openssl sockets json pdo_mysql libxml mbstring
 
 ## 2. 开发环境 / Development Environment
 
