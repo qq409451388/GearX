@@ -17,8 +17,6 @@ if [ -f /etc/os-release ]; then
 else
     OS=$(uname -s)
 fi
-print_info "Detected OS: $OS"
-
 # 针对不同系统的处理（如果需要）
 case "$OS" in
     *Ubuntu*|*Debian*)
