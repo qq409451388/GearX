@@ -12,6 +12,7 @@ print_info "$VERSION_MSG"
 
 # 询问用户是否需要检查环境
 read -p "$MSG_CHECK_ENV" check_env_choice
+check_env_choice="${check_env_choice:-y}"
 if [[ "$check_env_choice" == "y" ]]; then
     source "$SCRIPT_DIR/check_env.sh"
     print_success "$MSG_ENV_CHECK_COMPLETE"
@@ -32,7 +33,7 @@ EXAMPLE_PATH="$install_path/GearXExample"
 SSH_KEY_PATH="$HOME/.ssh/github_rsa"
 
 # 检查并创建安装目录
-if [[ -d "$GEARX_PATH" || -d "$EXAMPLE_PATH" ]]; then
+if [[ -d "$EXAMPLE_PATH" ]]; then
     print_error "$MSG_INSTALL_DIR_EXISTS"
     exit 1
 fi

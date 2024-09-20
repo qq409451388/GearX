@@ -29,7 +29,7 @@ if [ "$LANGUAGE" = "zh" ]; then
     MSG_ENTER_INSTALL_OPTION="请输入选项 (1 或 2):"
     MSG_USE_CUSTOM_SSH="是否要指定本地证书文件路径? (y/n (default)):"
     MSG_ENTER_SSH_PATH="请输入 SSH 密钥路径 (默认: $SSH_KEY_PATH):"
-    MSG_INSTALL_DIR_EXISTS="安装目录下已经存在 GearX 或 GearXExample 文件夹，脚本终止。"
+    MSG_INSTALL_DIR_EXISTS="安装目录下已经存在 GearXExample 文件夹，脚本终止。"
     MSG_CREATE_INSTALL_DIR_FAILED="无法创建安装目录，脚本终止。"
     MSG_INSTALL_DIR_CREATED="安装目录创建成功："
 else
@@ -57,7 +57,7 @@ else
     MSG_ENTER_INSTALL_OPTION="Enter option (1 (default) or 2):"
     MSG_USE_CUSTOM_SSH="Do you want to specify a custom SSH key path? (y/n(default)):"
     MSG_ENTER_SSH_PATH="Enter SSH key path (default: $SSH_KEY_PATH):"
-    MSG_INSTALL_DIR_EXISTS="Installation directory already contains GearX or GearXExample folder, aborting script."
+    MSG_INSTALL_DIR_EXISTS="Installation directory already contains GearXExample folder, aborting script."
     MSG_CREATE_INSTALL_DIR_FAILED="Failed to create installation directory, aborting script."
     MSG_INSTALL_DIR_CREATED="Installation directory created successfully: "
 fi
