@@ -157,9 +157,9 @@ guohan@ubuntu:/home/release# php /home/release/GearXExample/scripts/http_server.
 ```bash
 curl http://127.0.0.1:8888/test/helloworld && echo ''
 ```
-**看到正常输出 hello world! 说明项目部署完成**
+**看到正常输出 <hello world!> 说明项目部署完成**
 <br/>
-<i>**If you see the output hello world!, it means the project has been successfully deployed.**</i>
+<i>**If you see the output <hello world!>, it means the project has been successfully deployed.**</i>
 
 ## 5. 其他 / Additional Information
 + **【可选 / Optional】DB 工具需要配置 config 目录下的 dbcon.json、syshash.json**
