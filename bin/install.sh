@@ -49,9 +49,10 @@ fi
 
 # 3.2. 安装 Module
 print_info "$MSG_CHOOSE_INSTALL_METHOD"
-echo "1) 使用 HTTPS"
-echo "2) 使用 SSH"
+echo "1) HTTPS (default)"
+echo "2) SSH"
 read -p "$MSG_ENTER_INSTALL_OPTION" install_choice
+install_choice="${install_choice:-1}"
 
 if [[ "$install_choice" == "1" ]]; then
     # 3.2.1 使用 HTTPS 的方式安装
@@ -60,6 +61,7 @@ if [[ "$install_choice" == "1" ]]; then
 elif [[ "$install_choice" == "2" ]]; then
     # 3.2.2 使用 SSH 的方式安装
     read -p "$MSG_USE_CUSTOM_SSH" use_custom_ssh_key
+    use_custom_ssh_key="${use_custom_ssh_key:-n}"
     if [[ "$use_custom_ssh_key" == "y" ]]; then
         read -p "$MSG_ENTER_SSH_PATH" custom_ssh_key
         SSH_KEY_PATH="${custom_ssh_key:-$SSH_KEY_PATH}"
@@ -78,6 +80,8 @@ print_success "$MSG_EXAMPLE_CLONE_COMPLETE"
 
 # 3.4 启动服务
 read -p "$MSG_START_SERVICE" start_service
+start_service="${start_service:-y}"
+
 if [[ "$start_service" == "y" ]]; then
     php "$EXAMPLE_PATH/scripts/http_server.php" -PappPath="$EXAMPLE_PATH" -PgearPath="$GEARX_PATH" -PconfigPath="$EXAMPLE_PATH/config"
     print_success "$MSG_SERVICE_STARTED"
