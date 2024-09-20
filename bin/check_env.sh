@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 引入库文件
-source ./base_func.sh
-source ./language.sh
+source ./repository/base_func.sh
+source ./repository/language.sh
 
 # 输出脚本版本
 print_info "$VERSION_MSG"
