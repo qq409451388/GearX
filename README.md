@@ -5,11 +5,11 @@
 
 > GearX是一款纯PHP实现的轻量化的开发框架，旨在提供快速且舒适的方式开发项目，尤其是对于有过Java开发经验的开发者而言。
 >
-> GearX is a lightweight development framework implemented purely in PHP, designed to provide a fast and comfortable way to develop projects, especially for developers with Java experience.
+> <i>GearX is a lightweight development framework implemented purely in PHP, designed to provide a fast and comfortable way to develop projects, especially for developers with Java experience.</i>
 
-**设计文档 / Design Document:** [点击跳转 / Click Here](./DESIGN.md)  
-**变更文档 / Changelog:** [点击跳转 / Click Here](./CHANGELIST.md)  
-**开源许可 / License:** [点击跳转 / Click Here](./LICENSE)
+**设计文档 / Design Document:** >>>[点击跳转 / Click Here](./DESIGN.md)  
+**变更文档 / Changelog:** >>> [点击跳转 / Click Here](./CHANGELIST.md)  
+**开源许可 / License:** >>> [点击跳转 / Click Here](./LICENSE)
 
 # 特性&能力 / Features & Capabilities
 
@@ -18,8 +18,7 @@
 ![Feature](https://img.shields.io/badge/Feature-自定义注解-fe7d37?style=flat-square)
 
 1. **框架完全由PHP实现 / Fully Implemented in PHP**
-   - 包括项目开发中的常用功能，并可以按需获取引入，以下是部分模块：
-   - Includes common functions in project development, and can be introduced as needed. Here are some modules:
+   - 包括项目开发中的常用功能，并可以按需获取引入，以下是部分模块：<i>Includes common functions in project development, and can be introduced as needed. Here are some modules:<i>
       1. **GearModule-DB**: [点击跳转 / Click Here](https://github.com/qq409451388/GearModule-DB) - 数据库的查询组件，简化了大量操作，支持常见的数据库协议。
       2. **GearModule-ORM**: [点击跳转 / Click Here](https://github.com/qq409451388/GearModule-ORM) - ORM组件，对于Java Web开发来说必然倍感亲切。
       3. **GearModule-EzCache**: [点击跳转 / Click Here](https://github.com/qq409451388/GearModule-EzCache) - 缓存组件，基于PHP socket模块实现了Redis的服务端和客户端，也包括基于内存或文件实现的本地缓存。
@@ -27,16 +26,13 @@
       5. **GearModule-Web**: [点击跳转 / Click Here](https://github.com/qq409451388/GearModule-Web) - 网络组件，支持多种协议。
 
 2. **支持多种启动模式 / Supports Multiple Start Modes**
-   - Web服务启动、脚本模式启动、定时任务模式启动。
-   - Web service start, script mode start, scheduled task mode start.
+   - Web服务启动、脚本模式启动、定时任务模式启动。 <i>Web service start, script mode start, scheduled task mode start.</i>
 
 3. **Web服务使用常驻内存的方式 / Web Service Uses Resident Memory**
-   - 一次启动，多次复用。
-   - Start once, reuse multiple times.
+   - 一次启动，多次复用。 <i>Start once, reuse multiple times.</i>
 
 4. **内置了注解功能 / Built-in Annotation Functionality**
-   - 除了常用的注解外，支持开发者自定义注解。
-   - Supports developer-defined annotations in addition to common annotations.
+   - 除了常用的注解外，支持开发者自定义注解。 <i>Supports developer-defined annotations in addition to common annotations.</i>
 
 # 快速开始 / Quick Start
 
@@ -65,9 +61,9 @@
 ```bash
 mkdir /home/release && cd /home/release/ && git clone https://github.com/qq409451388/GearX
 ```
-**拉取完成框架之后，在Gear/bin下面我们提供了一个安装脚本，可以完成接下来的操作，不过也可以手动继续执行3.2开始的内容**
+<span style="color:red">重要!!!!</span> **拉取完成框架之后，在Gear/bin下面我们提供了一个安装脚本，可以完成接下来的操作，不过也可以手动继续执行3.2开始的内容**
 
-<i>**After cloning, an install script is provided under Gear/bin which can complete the following steps, or you can manually proceed from 3.2**</i>
+<span style="color:red">important!!!!</span> <i>**After cloning, an install script is provided under Gear/bin which can complete the following steps, or you can manually proceed from 3.2**</i>
 
 ```bash
   bash /home/release/GearX/bin/install.sh
