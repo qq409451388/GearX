@@ -7,6 +7,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/repository/base_func.sh"
 source "$SCRIPT_DIR/repository/language.sh"
 
+# 输出脚本版本信息
+print_info "$VERSION_MSG"
+
 # 询问用户是否需要检查环境
 read -p "$MSG_CHECK_ENV" check_env_choice
 if [[ "$check_env_choice" == "y" ]]; then
@@ -20,10 +23,28 @@ fi
 read -p "$MSG_ENTER_INSTALL_PATH" install_path
 install_path="${install_path:-/home/release}"
 
+# 去掉路径后面的斜线
+install_path="${install_path%/}"
+
 # 定义目录路径
 GEARX_PATH="$install_path/GearX"
 EXAMPLE_PATH="$install_path/GearXExample"
 SSH_KEY_PATH="$HOME/.ssh/github_rsa"
+
+# 检查并创建安装目录
+if [[ -d "$GEARX_PATH" || -d "$EXAMPLE_PATH" ]]; then
+    print_error "$MSG_INSTALL_DIR_EXISTS"
+    exit 1
+fi
+
+if [[ ! -d "$install_path" ]]; then
+    mkdir -p "$install_path"
+    if [[ $? -ne 0 ]]; then
+        print_error "$MSG_CREATE_INSTALL_DIR_FAILED"
+        exit 1
+    fi
+    print_success "$MSG_INSTALL_DIR_CREATED $install_path"
+fi
 
 # 3.2. 安装 Module
 print_info "$MSG_CHOOSE_INSTALL_METHOD"
