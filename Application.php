@@ -29,6 +29,11 @@ class Application
         } else if (!$context instanceof ApplicationContext) {
             $context = new ApplicationContext();
         }
+        if (!empty($context->getPhpIni())) {
+            foreach ($context->getPhpIni() as $key => $value) {
+                ini_set($key, $value);
+            }
+        }
         Application::$context = $context;
     }
 
@@ -433,12 +438,13 @@ class ApplicationContext {
     private $defaultConfigPath;
     /**
      * User-defined dependency-related configuration
+     * default at [appPath]/config
      * for instead of the <defaultConfigPath>
      */
     private $systemConfigPath;
     /**
      * User-defined parameter attribute configuration
-     * default at [appPath]/config is exists
+     * default at [appPath]/config is not exists
      */
     private $configPath;
     private $globalCoreClass = [];
@@ -447,6 +453,8 @@ class ApplicationContext {
     private $configuration = null;
 
     private $env = null;
+    private $phpini = [];
+    private $customerArgs = [];
 
     public function __construct($args = []) {
         foreach ($args as $arg) {
@@ -459,7 +467,8 @@ class ApplicationContext {
                     continue;
                 }
                 if (!property_exists($this, $k)) {
-                    echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument {$matches[2]} and ignored.".PHP_EOL;
+                    //echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument {$matches[2]} and ignored.".PHP_EOL;
+                    $this->customerArgs[$k] = $v;
                     continue;
                 }
                 $this->$k = $v;
@@ -473,7 +482,11 @@ class ApplicationContext {
                     continue;
                 }
                 if (!property_exists($this, $k)) {
-                    echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument $v and ignored.".PHP_EOL;
+                    //echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument $v and ignored.".PHP_EOL;
+                    if ($this->customerArgs[$k] == null) {
+                        $this->customerArgs[$k] = [];
+                    }
+                    $this->customerArgs[$k][$k2] = $v;
                     continue;
                 }
                 if ($this->$k === null) {
@@ -489,7 +502,8 @@ class ApplicationContext {
                     continue;
                 }
                 if (!property_exists($this, $k)) {
-                    echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument $v and ignored.".PHP_EOL;
+                    //echo "[".date("Y-m-d H:i:s")."][WARN]Unknown property $k for argument $v and ignored.".PHP_EOL;
+                    $this->customerArgs[$k] = $v;
                     continue;
                 }
                 $this->$k = $v;
@@ -530,6 +544,7 @@ class ApplicationContext {
 
     public function setAppPath($appPath): void {
         $this->appPath = $appPath;
+        $this->systemConfigPath = $this->appPath."/config";
     }
 
     public function getGearPath() {
@@ -612,5 +627,9 @@ class ApplicationContext {
     public function setEnv($env): void
     {
         $this->env = $env;
+    }
+
+    public function getPhpIni() {
+        return $this->phpini;
     }
 }
