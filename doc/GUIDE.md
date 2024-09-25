@@ -1,4 +1,6 @@
 # 框架手册
+![GitHub](https://img.shields.io/badge/Github-GearX-007ec6?style=flat-square)
+![Version](https://img.shields.io/badge/Version-Beta%20v0.2.5-fe7d37?style=flat-square)
 > GearX 框架使用常驻内存模式启动，基于注解实现完成各项功能
 > <br/>
 > 本手册针对各项功能和能力进行介绍
