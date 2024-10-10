@@ -7,6 +7,7 @@
 >
 > <i>GearX is a lightweight development framework implemented purely in PHP, designed to provide a fast and comfortable way to develop projects, especially for developers with Java experience.</i>
 
+**开发手册 / Develop Guide:** >>>[点击跳转 / Click Here](doc/GUIDE.md)  
 **设计文档 / Design Document:** >>>[点击跳转 / Click Here](doc/DESIGN.md)  
 **变更文档 / Changelog:** >>> [点击跳转 / Click Here](doc/CHANGELIST.md)  
 **开源许可 / License:** >>> [点击跳转 / Click Here](./LICENSE)
