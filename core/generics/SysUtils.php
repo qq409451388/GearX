@@ -116,4 +116,18 @@ class SysUtils
         $id = uniqid();
         return md5(time()).'-'.$id;
     }
+
+    public static function extensionLoaded($extensions) {
+        $unload = [];
+        if (empty($extensions)) {
+            return $unload;
+        }
+        foreach ($extensions as $extension) {
+            if (extension_loaded($extension)) {
+                continue;
+            }
+            $unload[] = $extension;
+        }
+        return $unload;
+    }
 }
