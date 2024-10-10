@@ -45,3 +45,13 @@
 # modules
 * dependency collect and check (package.info)
 * config collect and check
+
+## modules dependency relations
+* **[ConnPool]** 
+* **[DB]** DB->EzCache->web
+* **[EzCache]** EzCache->web
+* **[EzCurl]**
+* **[ORM]** ORM->DB、EzCache
+* **[WEB]**
+* **[Utils]**
+* **[Painter]**
