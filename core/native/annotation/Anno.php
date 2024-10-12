@@ -1,5 +1,13 @@
 <?php
 
+namespace annotation;
+
+use anno\di\DiAspect;
+use annotation\annoconst\AnnoElementType;
+use annotation\annoconst\AnnoPolicyEnum;
+use annotation\annoconst\AnnoValueTypeEnum;
+use Logger;
+
 /**
  * 注解
  */
@@ -25,8 +33,8 @@ abstract class Anno
     abstract public static function constStruct();
 
     /**
-     * 非必须，切面逻辑类名，触发此注解时，执行的逻辑 @example {@see DiAspect}
-     * @return Aspect|null
+     * 非必须，切面逻辑类名，触发此注解时，执行的逻辑 @return Aspect|null
+     * @example {@see DiAspect}
      */
     abstract public static function constAspect();
 
@@ -34,7 +42,8 @@ abstract class Anno
      * 将传入的字符串或map格式的数组赋值到注解对象中
      * @param array<string, mixed>|string $values
      */
-    public function combine($values){
+    public function combine($values)
+    {
         if (is_array($values)) {
             foreach ($values as $k => $v) {
                 $this->$k = $v;
@@ -47,17 +56,21 @@ abstract class Anno
     /**
      * @return int 注解优先级，越大越先执行
      */
-    public function getOrder() {
+    public function getOrder()
+    {
         return $this->order;
     }
 
-    public function __get($name) {
-        $method = "get".ucfirst($name);
+    public function __get($name)
+    {
+        $method = "get" . ucfirst($name);
         if (method_exists($this, $method)) {
             return $this->$method();
-        } else if (isset($this->value)) {
-            Logger::warn("[Anno] unsafe get data for sourcekey {}", $name);
-            return $this->value;
+        } else {
+            if (isset($this->value)) {
+                Logger::warn("[Anno] unsafe get data for sourcekey {}", $name);
+                return $this->value;
+            }
         }
         Logger::error("[Anno] no get data for key {}", $name);
         return null;

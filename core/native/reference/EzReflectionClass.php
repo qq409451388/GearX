@@ -1,5 +1,9 @@
 <?php
 
+use annotation\AnnoationElement;
+use annotation\AnnoationRule;
+use annotation\annoconst\AnnoElementType;
+
 class EzReflectionClass extends ReflectionClass
 {
     use EzReflectionTrait;

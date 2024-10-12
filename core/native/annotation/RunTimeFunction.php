@@ -1,4 +1,9 @@
 <?php
+
+namespace annotation;
+
+use EzDataObject;
+
 class RunTimeFunction implements EzDataObject
 {
     /**
@@ -23,7 +28,13 @@ class RunTimeFunction implements EzDataObject
 
     public $after;
 
-    public static function create($bindFuncName, $anonymousId, $anonymous, $order = 0, array $after = null):RunTimeFunction {
+    public static function create(
+        $bindFuncName,
+        $anonymousId,
+        $anonymous,
+        $order = 0,
+        array $after = null
+    ): RunTimeFunction {
         $item = new static();
         $item->bindFuncName = $bindFuncName;
         $item->anonymousId = $anonymousId;

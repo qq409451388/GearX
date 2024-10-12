@@ -1,4 +1,9 @@
 <?php
+
+namespace annotation;
+
+use annotation\annoconst\AnnoElementType;
+
 class AnnoationElement
 {
     public $annoName;
@@ -19,7 +24,8 @@ class AnnoationElement
      */
     public $paramType;
 
-    public static function create($n, $v, $a){
+    public static function create($n, $v, $a)
+    {
         $obj = new AnnoationElement();
         $obj->annoName = $n;
         $obj->value = $v;
@@ -28,7 +34,8 @@ class AnnoationElement
         return $obj;
     }
 
-    public static function createComplex($n, $v, $a){
+    public static function createComplex($n, $v, $a)
+    {
         $obj = new AnnoationElement();
         $obj->annoName = $n;
         $obj->value = $v;
@@ -37,7 +44,8 @@ class AnnoationElement
         return $obj;
     }
 
-    public function getValue():Anno{
+    public function getValue(): Anno
+    {
         if (!is_null($this->anno)) {
             return $this->anno;
         }
@@ -51,7 +59,8 @@ class AnnoationElement
         return $anno;
     }
 
-    public function isNormal(){
+    public function isNormal()
+    {
         return "NORMAL" == $this->paramType;
     }
 }

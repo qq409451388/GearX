@@ -1,4 +1,9 @@
 <?php
+
+namespace annotation\annoconst;
+
+use EzCheckUtils;
+
 class AnnoElementType
 {
     public const TYPE = 1;
@@ -14,7 +19,8 @@ class AnnoElementType
         self::TYPE => "Any Where"
     ];
 
-    public static function getDesc($expected){
+    public static function getDesc($expected)
+    {
         if (EzCheckUtils::isList($expected)) {
             return implode(",", array_map(function ($item) {
                 return self::getDesc($item);

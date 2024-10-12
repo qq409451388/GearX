@@ -1,7 +1,16 @@
 <?php
-class JsonProperty extends Anno
+
+namespace anno\di;
+
+use annotation\Anno;
+use annotation\annoconst\AnnoElementType;
+use annotation\annoconst\AnnoPolicyEnum;
+use annotation\annoconst\AnnoValueTypeEnum;
+
+class Autowired extends Anno
 {
-    public function getColumn() {
+    public function getClassName()
+    {
         return $this->value;
     }
 
@@ -22,6 +31,6 @@ class JsonProperty extends Anno
 
     public static function constAspect()
     {
-        return null;
+        return DiAspect::class;
     }
 }

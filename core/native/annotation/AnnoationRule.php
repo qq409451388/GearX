@@ -1,9 +1,23 @@
 <?php
 
+namespace annotation;
+
+use annotation\annoconst\AnnoElementType;
+use annotation\annoconst\AnnoValueTypeEnum;
+use Clazz;
+use DBC;
+use EzCheckUtils;
+use EzCodecUtils;
+use EzHelper;
+use EzReflectionClass;
+use EzReflectionMethod;
+use EzReflectionProperty;
+use EzStringUtils;
+use Logger;
+
 class AnnoationRule implements EzHelper
 {
-    private function __construct() {
-    }
+    private function __construct() {}
 
     /**
      * @param EzReflectionClass|EzReflectionMethod|EzReflectionProperty $reflection
@@ -11,7 +25,8 @@ class AnnoationRule implements EzHelper
      * @return AnnoationElement
      * @throws Exception
      */
-    public static function searchAnnoation($reflection, Clazz $annoName) {
+    public static function searchAnnoation($reflection, Clazz $annoName)
+    {
         $valueType = $annoName->callStatic("constStruct");
         $at = $annoName->callStatic("constTarget");
         $refTarget = self::getRefTarget($reflection);
@@ -22,20 +37,37 @@ class AnnoationRule implements EzHelper
         }
         switch ($valueType) {
             case AnnoValueTypeEnum::TYPE_LITE:
-                return self::searchCertainlyLiteAnnoationFromDoc($reflection->getDocComment(), $refTarget, $annoName->getName());
+                return self::searchCertainlyLiteAnnoationFromDoc(
+                    $reflection->getDocComment(),
+                    $refTarget,
+                    $annoName->getName()
+                );
             case AnnoValueTypeEnum::TYPE_NORMAL:
-                return self::searchCertainlyNormalAnnoationFromDoc($reflection->getDocComment(), $refTarget, $annoName->getName());
+                return self::searchCertainlyNormalAnnoationFromDoc(
+                    $reflection->getDocComment(),
+                    $refTarget,
+                    $annoName->getName()
+                );
             case AnnoValueTypeEnum::TYPE_RELATION:
-                return self::searchCertainlyRelationshipAnnoationFromDoc($reflection->getDocComment(), $refTarget, $annoName->getName());
+                return self::searchCertainlyRelationshipAnnoationFromDoc(
+                    $reflection->getDocComment(),
+                    $refTarget,
+                    $annoName->getName()
+                );
             case AnnoValueTypeEnum::TYPE_LIST:
-                return self::searchCertainlyListAnnoationFromDoc($reflection->getDocComment(), $refTarget, $annoName->getName());
+                return self::searchCertainlyListAnnoationFromDoc(
+                    $reflection->getDocComment(),
+                    $refTarget,
+                    $annoName->getName()
+                );
             default:
                 Logger::warn("[AnnoationRule] Unsupport STRUCT for Anno:{}", $annoName->getName());
                 return null;
         }
     }
 
-    private static function getRefTarget($reflection) {
+    private static function getRefTarget($reflection)
+    {
         $className = get_class($reflection);
         switch ($className) {
             case EzReflectionClass::class:
@@ -54,11 +86,12 @@ class AnnoationRule implements EzHelper
 
     /**
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at       {@see AnnoElementType}
      * @param string $annoName implements Anno
      * @return AnnoationElement
      */
-    public static function searchCertainlyLiteAnnoationFromDoc($document, $at, $annoName) {
+    public static function searchCertainlyLiteAnnoationFromDoc($document, $at, $annoName)
+    {
         if (empty($annoName)) {
             return null;
         }
@@ -66,7 +99,7 @@ class AnnoationRule implements EzHelper
             Logger::warn("[Gear] UnExpected AnnoInfo:{}", $annoName);
             return null;
         }
-        $s= "/(.*)@$annoName\s?/";
+        $s = "/(.*)@$annoName\s?/";
         preg_match($s, $document, $matched);
         if (empty($matched)) {
             return null;
@@ -76,11 +109,12 @@ class AnnoationRule implements EzHelper
 
     /**
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at       {@see AnnoElementType}
      * @param string $annoName implements Anno
      * @return AnnoationElement
      */
-    public static function searchCertainlyNormalAnnoationFromDoc($document, $at, $annoName) {
+    public static function searchCertainlyNormalAnnoationFromDoc($document, $at, $annoName)
+    {
         if (empty($annoName)) {
             return null;
         }
@@ -88,7 +122,7 @@ class AnnoationRule implements EzHelper
             Logger::warn("[Gear] UnExpected AnnoInfo:{}", $annoName);
             return null;
         }
-        $s= "/(.*)@$annoName\(\s?\'?\"?(?<content>[\/a-zA-Z0-9\#\{\}\*_]+)\'?\"?\s?\)/";
+        $s = "/(.*)@$annoName\(\s?\'?\"?(?<content>[\/a-zA-Z0-9\#\{\}\*_]+)\'?\"?\s?\)/";
         preg_match($s, $document, $matched);
         if (empty($matched['content'])) {
             return null;
@@ -98,10 +132,11 @@ class AnnoationRule implements EzHelper
 
     /**
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at {@see AnnoElementType}
      * @return AnnoationElement
      */
-    public static function searchCertainlyListAnnoationFromDoc($document, $at, $annoName) {
+    public static function searchCertainlyListAnnoationFromDoc($document, $at, $annoName)
+    {
         if (!is_subclass_of($annoName, Anno::class)) {
             Logger::warn("[Gear] UnExpected AnnoInfo:{}", $annoName);
             return null;
@@ -127,10 +162,11 @@ class AnnoationRule implements EzHelper
 
     /**
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at {@see AnnoElementType}
      * @return AnnoationElement
      */
-    public static function searchCertainlyRelationshipAnnoationFromDoc($document, $at, $annoName) {
+    public static function searchCertainlyRelationshipAnnoationFromDoc($document, $at, $annoName)
+    {
         if (!is_subclass_of($annoName, Anno::class)) {
             Logger::warn("[Gear] UnExpected AnnoInfo:{}", $annoName);
             return null;
@@ -157,23 +193,28 @@ class AnnoationRule implements EzHelper
     /**
      * @return AnnoationElement
      */
-    public static function searchCertainlyRelationshipAnnoation($class, $annoName) {
-        return self::searchCertainlyRelationshipAnnoationFromDoc((new ReflectionClass($class))->getDocComment(),
-            AnnoElementType::TYPE_CLASS, $annoName);
+    public static function searchCertainlyRelationshipAnnoation($class, $annoName)
+    {
+        return self::searchCertainlyRelationshipAnnoationFromDoc(
+            (new ReflectionClass($class))->getDocComment(),
+            AnnoElementType::TYPE_CLASS,
+            $annoName
+        );
     }
 
     /**
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at {@see AnnoElementType}
      * @return array<AnnoationElement>
      */
-    public static function searchNormalAnnoation($document, $at) {
+    public static function searchNormalAnnoation($document, $at)
+    {
         $list = [];
         /**
          * 注解第一种类型，参数为普通字符串
          * @example: @XXX("qqq") 或 @YYY('qqq')
          */
-        $s= "/(.*)@(?<annoName>[a-zA-Z0-9]+)\(\s?\'?\"?(?<content>[\-\/\_\/a-zA-Z0-9\#\{\}\*\.]+)\'?\"?\s?\)/";
+        $s = "/(.*)@(?<annoName>[a-zA-Z0-9]+)\(\s?\'?\"?(?<content>[\-\/\_\/a-zA-Z0-9\#\{\}\*\.]+)\'?\"?\s?\)/";
         preg_match_all($s, $document, $matchedes, 2);
         foreach ($matchedes as $matched) {
             if (empty($matched['annoName'])) {
@@ -196,10 +237,11 @@ class AnnoationRule implements EzHelper
 
     /**
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at {@see AnnoElementType}
      * @return array<AnnoationElement>
      */
-    public static function searchJsonAnnoation($document, $at) {
+    public static function searchJsonAnnoation($document, $at)
+    {
         $list = [];
         /**
          * 注解第二种类型，参数为JSON字符串
@@ -216,7 +258,7 @@ class AnnoationRule implements EzHelper
                 Logger::warn("[Gear] Empty Content AnnoInfo:{} ", $annoName);
                 continue;
             }
-            $content = "{".$matched['content']."}";
+            $content = "{" . $matched['content'] . "}";
             if (!EzCheckUtils::isJson($content)) {
                 Logger::warn("[Gear] Invalid Content AnnoInfo:{}, Content:{}", $annoName, $content);
                 continue;
@@ -233,10 +275,11 @@ class AnnoationRule implements EzHelper
 
     /**
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at {@see AnnoElementType}
      * @return array<AnnoationElement>
      */
-    public static function searchLiteAnnoation($document, $at) {
+    public static function searchLiteAnnoation($document, $at)
+    {
         $list = [];
         /**
          * 注解第三种类型，无任何参数
@@ -261,10 +304,11 @@ class AnnoationRule implements EzHelper
     /**
      * todo 支持中文
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at {@see AnnoElementType}
      * @return array<AnnoationElement>
      */
-    public static function searchListAnnoation($document, $at) {
+    public static function searchListAnnoation($document, $at)
+    {
         $list = [];
         /**
          * 注解第四种类型，参数为箭头映射
@@ -296,10 +340,11 @@ class AnnoationRule implements EzHelper
     /**
      * 冲突！和searchNormal
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at {@see AnnoElementType}
      * @return array<AnnoationElement>
      */
-    public static function searchRelationshipAnnoation($document, $at) {
+    public static function searchRelationshipAnnoation($document, $at)
+    {
         $list = [];
         /**
          * 注解第四种类型，参数为箭头映射
@@ -329,10 +374,11 @@ class AnnoationRule implements EzHelper
 
     /**
      * @param string $document
-     * @param int $at {@see AnnoElementType}
+     * @param int    $at {@see AnnoElementType}
      * @return array<AnnoationElement>
      */
-    public static function searchAnnoationFromDocument($document, $at) {
+    public static function searchAnnoationFromDocument($document, $at)
+    {
         return array_merge(
             self::searchNormalAnnoation($document, $at),
             self::searchJsonAnnoation($document, $at),

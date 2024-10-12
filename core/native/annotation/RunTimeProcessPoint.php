@@ -1,5 +1,10 @@
 <?php
 
+namespace annotation;
+
+use EzReflectionClass;
+use EzString;
+
 /**
  * 动态代理类运行时，上下文信息
  */
@@ -40,7 +45,8 @@ class RunTimeProcessPoint
      */
     private $isSkip;
 
-    public function __construct($c, $f, $a, $r){
+    public function __construct($c, $f, $a, $r)
+    {
         $this->className = $c;
         $this->functionName = $f;
         $this->args = $a;
@@ -116,18 +122,24 @@ class RunTimeProcessPoint
      * 篡改返回值
      * @return void
      */
-    public function tampering($newReturn){
+    public function tampering($newReturn)
+    {
         $this->returnValue = $newReturn;
     }
 
-    public function __toString(){
+    public function __toString()
+    {
         $methodRef = $this->classInstance->getMethod($this->functionName);
         $argRefs = $methodRef->getParameters();
         $arguments = [];
-        foreach ($argRefs as $k => $argRef){
-            $arguments[$argRef->getName()] = is_object($this->args[$k]) ? get_class($this->args[$k])."@Instance" : $this->args[$k];
+        foreach ($argRefs as $k => $argRef) {
+            $arguments[$argRef->getName()] = is_object($this->args[$k]) ? get_class(
+                    $this->args[$k]
+                ) . "@Instance" : $this->args[$k];
         }
-        return "Called ".$this->functionName."@".$this->className." with args:".EzString::toString($arguments);
+        return "Called " . $this->functionName . "@" . $this->className . " with args:" . EzString::toString(
+                $arguments
+            );
     }
 
     /**

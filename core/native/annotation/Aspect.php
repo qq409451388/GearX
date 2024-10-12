@@ -1,4 +1,13 @@
 <?php
+
+namespace annotation;
+
+use BeanFinder;
+use DynamicProxy;
+use EzReflectionClass;
+use EzReflectionMethod;
+use EzReflectionProperty;
+
 abstract class Aspect
 {
     private $annoName;
@@ -130,7 +139,7 @@ abstract class Aspect
      */
     public function getDependConf()
     {
-        return $this->dependConf?:[];
+        return $this->dependConf ?: [];
     }
 
     /**
@@ -139,7 +148,7 @@ abstract class Aspect
     public function setDependConf($dependConf): void
     {
         $this->dependConf = $dependConf;
-        if(!is_null($dependConf)){
+        if (!is_null($dependConf)) {
             $this->dependList = [];
         }
     }
@@ -156,8 +165,9 @@ abstract class Aspect
      * @param array<Aspect> $aspectList
      * @return void
      */
-    public function addDepend($aspectList){
-        if(empty($aspectList)){
+    public function addDepend($aspectList)
+    {
+        if (empty($aspectList)) {
             return;
         }
         $this->dependList = array_merge($this->dependList, $aspectList);
@@ -187,45 +197,56 @@ abstract class Aspect
         $this->atProperty = $atProperty;
     }
 
-    public function check(): bool {
+    public function check(): bool
+    {
         return true;
     }
 
     /**
      * 在项目启动时执行，以构建代理类
-     * @link RunTimeAspect
-     * @uses RunTimeAspect
      * @return void
+     * @uses RunTimeAspect
+     * @link RunTimeAspect
      */
     public function around(): void
     {
         $object = BeanFinder::get()->pull($this->getAtClass()->getName());
-        if(!$object instanceof DynamicProxy){
+        if (!$object instanceof DynamicProxy) {
             $dynamic = DynamicProxy::__CALL__get($object);
-        }else{
+        } else {
             $dynamic = $object;
         }
-        if(!is_null($this->getAtMethod())){
-            $dynamic->__CALL__registeBefore($this->getAtMethod()->getName(), $this->annoName, function(RunTimeProcessPoint $rpp) {
+        if (!is_null($this->getAtMethod())) {
+            $dynamic->__CALL__registeBefore(
+                $this->getAtMethod()->getName(),
+                $this->annoName,
+                function (RunTimeProcessPoint $rpp) {
+                    /**
+                     * @var $this RunTimeAspect
+                     */
+                    $this->before($rpp);
+                },
+                $this->value->getOrder()
+            );
+            $dynamic->__CALL__registeAfter(
+                $this->getAtMethod()->getName(),
+                $this->annoName,
+                function (RunTimeProcessPoint $rpp) {
+                    /**
+                     * @var $this RunTimeAspect
+                     */
+                    $this->after($rpp);
+                },
+                $this->value->getOrder()
+            );
+        } else {
+            $dynamic->__CALL__registeBeforeAll($this->annoName, function (RunTimeProcessPoint $rpp) {
                 /**
                  * @var $this RunTimeAspect
                  */
                 $this->before($rpp);
             }, $this->value->getOrder());
-            $dynamic->__CALL__registeAfter($this->getAtMethod()->getName(), $this->annoName, function(RunTimeProcessPoint $rpp){
-                /**
-                 * @var $this RunTimeAspect
-                 */
-                $this->after($rpp);
-            }, $this->value->getOrder());
-        }else{
-            $dynamic->__CALL__registeBeforeAll($this->annoName, function(RunTimeProcessPoint $rpp) {
-                /**
-                 * @var $this RunTimeAspect
-                 */
-                $this->before($rpp);
-            }, $this->value->getOrder());
-            $dynamic->__CALL__registeAfterAll($this->annoName, function(RunTimeProcessPoint $rpp){
+            $dynamic->__CALL__registeAfterAll($this->annoName, function (RunTimeProcessPoint $rpp) {
                 /**
                  * @var $this RunTimeAspect
                  */

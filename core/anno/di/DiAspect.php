@@ -1,5 +1,15 @@
 <?php
 
+namespace anno\di;
+
+use annotation\Aspect;
+use annotation\BuildAspect;
+use BeanFinder;
+use Config;
+use DBC;
+use DynamicProxy;
+use GearShutDownException;
+
 /**
  * 依赖注入切面
  */
@@ -13,15 +23,23 @@ class DiAspect extends Aspect implements BuildAspect
 
     public function adhere(): void
     {
-        if(Resource::class == $this->getAnnoName()){
+        if (Resource::class == $this->getAnnoName()) {
             $className = $this->getValue()->className;
-            $object =  BeanFinder::get()->pull($className);
-            DBC::assertTrue($object instanceof DynamicProxy, "[DiAspect] 待注入对象{$className}必须为DynamicProxy实例!",
-                0, GearShutDownException::class);
+            $object = BeanFinder::get()->pull($className);
+            DBC::assertTrue(
+                $object instanceof DynamicProxy,
+                "[DiAspect] 待注入对象{$className}必须为DynamicProxy实例!",
+                0,
+                GearShutDownException::class
+            );
             $this->getAtProperty()->setAccessible(true);
             $classObj = BeanFinder::get()->pull($this->getAtClass()->getName());
-            DBC::assertTrue($classObj instanceof DynamicProxy, "[DiAspect] 被注入对象{$this->getAtClass()->getName()}必须为DynamicProxy实例!",
-                0, GearShutDownException::class);
+            DBC::assertTrue(
+                $classObj instanceof DynamicProxy,
+                "[DiAspect] 被注入对象{$this->getAtClass()->getName()}必须为DynamicProxy实例!",
+                0,
+                GearShutDownException::class
+            );
             $this->getAtProperty()->setValue($classObj->__CALL__getSourceObj(), $object);
             $this->getAtProperty()->setAccessible(false);
         }
@@ -31,10 +49,10 @@ class DiAspect extends Aspect implements BuildAspect
             BeanFinder::get()->analyseClasses();
             $className = $this->getValue()->className;
 
-            if(!BeanFinder::get()->has($className)){
+            if (!BeanFinder::get()->has($className)) {
                 BeanFinder::get()->save($className, (new $className));
             }
-            $object =  BeanFinder::get()->pull($className);
+            $object = BeanFinder::get()->pull($className);
             $this->getAtProperty()->setAccessible(true);
             $classObj = BeanFinder::get()->pull($this->getAtClass()->getName());
             $classObj = $classObj instanceof DynamicProxy ? $classObj->__CALL__getSourceObj() : $classObj;
@@ -48,6 +66,5 @@ class DiAspect extends Aspect implements BuildAspect
             $this->getAtProperty()->setValue($classObj->__CALL__getSourceObj(), Config::get($configValue));
             $this->getAtProperty()->setAccessible(false);
         }
-
     }
 }

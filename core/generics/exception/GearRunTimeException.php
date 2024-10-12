@@ -3,7 +3,7 @@
 /**
  * 运行时异常
  */
-class GearRunTimeException extends \Exception
+class GearRunTimeException extends annotation\RunTimeFunction
 {
 
 }

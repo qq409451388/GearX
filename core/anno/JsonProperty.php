@@ -1,7 +1,13 @@
 <?php
-class Resource extends Anno
+
+use annotation\Anno;
+use annotation\annoconst\AnnoElementType;
+use annotation\annoconst\AnnoPolicyEnum;
+use annotation\annoconst\AnnoValueTypeEnum;
+
+class JsonProperty extends Anno
 {
-    public function getClassName() {
+    public function getColumn() {
         return $this->value;
     }
 
@@ -22,6 +28,6 @@ class Resource extends Anno
 
     public static function constAspect()
     {
-        return DiAspect::class;
+        return null;
     }
 }

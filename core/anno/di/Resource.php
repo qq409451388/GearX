@@ -1,7 +1,16 @@
 <?php
-class Autowired extends Anno
+
+namespace anno\di;
+
+use annotation\Anno;
+use annotation\annoconst\AnnoElementType;
+use annotation\annoconst\AnnoPolicyEnum;
+use annotation\annoconst\AnnoValueTypeEnum;
+
+class Resource extends Anno
 {
-    public function getClassName() {
+    public function getClassName()
+    {
         return $this->value;
     }
 

@@ -1,4 +1,7 @@
 <?php
+
+namespace annotation\annoconst;
+
 class AnnoPolicyEnum
 {
     /**

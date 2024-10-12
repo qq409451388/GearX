@@ -1,4 +1,18 @@
 <?php
+
+namespace annotation;
+
+use annotation\annoconst\AnnoElementType;
+use annotation\annoconst\AnnoPolicyEnum;
+use Application;
+use BeanFinder;
+use DBC;
+use DynamicProxy;
+use EzCheckUtils;
+use EzReflectionClass;
+use EzReflectionProperty;
+use EzStarter;
+
 class AnnoationStarter implements EzStarter
 {
 
@@ -19,20 +33,21 @@ class AnnoationStarter implements EzStarter
 
     /**
      * @param EzReflectionClass $reflection
-     * @param array<Aspect> $aspectList
+     * @param array<Aspect>     $aspectList
      * @return void
      */
-    private function fetchAnnoFromClass($reflection, array &$aspectList, array &$twichClassAspect) {
+    private function fetchAnnoFromClass($reflection, array &$aspectList, array &$twichClassAspect)
+    {
         $classAnnoList = $reflection->getAnnoationList();
-        foreach($classAnnoList as $classAnno){
+        foreach ($classAnnoList as $classAnno) {
             $aspectClass = $this->buildPoorAspect($classAnno);
             if (is_null($aspectClass)) {
                 continue;
             }
             $aspectClass->setAtClass($reflection);
-            if(!is_null($aspectClass->getDependConf())){
+            if (!is_null($aspectClass->getDependConf())) {
                 $twichClassAspect[] = $aspectClass;
-            }else{
+            } else {
                 $aspectList[] = $aspectClass;
             }
         }
@@ -40,23 +55,24 @@ class AnnoationStarter implements EzStarter
 
     /**
      * @param EzReflectionClass $reflection
-     * @param array<Aspect> $aspectList
+     * @param array<Aspect>     $aspectList
      * @return void
      */
-    private function fetchAnnoFromMethod($reflection, array &$aspectList, array &$aspectMethodList) {
+    private function fetchAnnoFromMethod($reflection, array &$aspectList, array &$aspectMethodList)
+    {
         $reflectionMethods = $reflection->getMethods();
-        foreach($reflectionMethods as $reflectionMethod){
+        foreach ($reflectionMethods as $reflectionMethod) {
             $methodAnnoList = $reflectionMethod->getAnnoationList();
-            foreach($methodAnnoList as $methodAnno){
+            foreach ($methodAnnoList as $methodAnno) {
                 $aspectMethod = $this->buildPoorAspect($methodAnno);
                 if (is_null($aspectMethod)) {
                     continue;
                 }
                 $aspectMethod->setAtClass($reflection);
                 $aspectMethod->setAtMethod($reflectionMethod);
-                if($aspectMethod->isCombination()){
+                if ($aspectMethod->isCombination()) {
                     $aspectMethodList[$aspectMethod->getAnnoName()][] = $aspectMethod;
-                }else{
+                } else {
                     $aspectList[] = $aspectMethod;
                 }
             }
@@ -69,43 +85,46 @@ class AnnoationStarter implements EzStarter
      * @param array<string, array<EzReflectionProperty>> $aspectPropertyList
      * @return void
      */
-    private function fetchAnnoFromProperty($reflection, array &$aspectList, array &$aspectPropertyList) {
+    private function fetchAnnoFromProperty($reflection, array &$aspectList, array &$aspectPropertyList)
+    {
         $reflectionProperties = $reflection->getProperties();
-        foreach($reflectionProperties as $reflectionProperty){
+        foreach ($reflectionProperties as $reflectionProperty) {
             $propertyAnnoList = $reflectionProperty->getAnnoationList();
-            foreach($propertyAnnoList as $propertyAnno){
+            foreach ($propertyAnnoList as $propertyAnno) {
                 $aspectProperty = $this->buildPoorAspect($propertyAnno);
                 if (is_null($aspectProperty)) {
                     continue;
                 }
                 $aspectProperty->setAtClass($reflection);
                 $aspectProperty->setAtProperty($reflectionProperty);
-                if($aspectProperty->isCombination()){
+                if ($aspectProperty->isCombination()) {
                     $aspectPropertyList[$aspectProperty->getAnnoName()][] = $aspectProperty;
-                }else{
+                } else {
                     $aspectList[] = $aspectProperty;
                 }
             }
         }
     }
 
-    private function fetchAnnoForDepend($twichClassAspect, $aspectMethodList, $aspectPropertyList, array &$aspectList) {
-        foreach($twichClassAspect as $classAspect){
+    private function fetchAnnoForDepend($twichClassAspect, $aspectMethodList, $aspectPropertyList, array &$aspectList)
+    {
+        foreach ($twichClassAspect as $classAspect) {
             /**
              * @var Aspect $classAspect
              */
             $dependClassList = $classAspect->getDependConf();
-            foreach($dependClassList as $dependClass){
-                $classAspect->addDepend($aspectMethodList[$dependClass]??[]);
-                $classAspect->addDepend($aspectPropertyList[$dependClass]??[]);
+            foreach ($dependClassList as $dependClass) {
+                $classAspect->addDepend($aspectMethodList[$dependClass] ?? []);
+                $classAspect->addDepend($aspectPropertyList[$dependClass] ?? []);
             }
             $aspectList[] = $classAspect;
         }
     }
 
-    private function fetchBeanAspect(){
+    private function fetchBeanAspect()
+    {
         $aspectList = [];
-        foreach(BeanFinder::get()->getAll(DynamicProxy::class) as $obj) {
+        foreach (BeanFinder::get()->getAll(DynamicProxy::class) as $obj) {
             /**
              * @var DynamicProxy $obj
              */
@@ -125,7 +144,8 @@ class AnnoationStarter implements EzStarter
         return $aspectList;
     }
 
-    private function fetchComponentAspect() {
+    private function fetchComponentAspect()
+    {
         $aspectList = [];
         if (empty(Application::getContext()->getGlobalComponentClass())) {
             return $aspectList;
@@ -143,8 +163,9 @@ class AnnoationStarter implements EzStarter
         return $aspectList;
     }
 
-    public function start(){
-        foreach($this->aspectList as $aspect){
+    public function start()
+    {
+        foreach ($this->aspectList as $aspect) {
             if (!$aspect->check()) {
                 continue;
             }
@@ -158,22 +179,28 @@ class AnnoationStarter implements EzStarter
     }
 
 
-
     /**
      * @param AnnoationElement $annoItem
      * @return Aspect
      * @throws Exception
      */
-    private function buildPoorAspect(AnnoationElement $annoItem){
+    private function buildPoorAspect(AnnoationElement $annoItem)
+    {
         $k = $annoItem->annoName;
         $v = $annoItem->getValue();
         DBC::assertNotEmpty($v->constStruct(), "[Gear] Anno $k Must Defined Const STRUCT!");
         $target = $v->constTarget();
         if (EzCheckUtils::isList($target)) {
-            DBC::assertTrue(in_array($annoItem->at, $target),
-                "[Gear] Anno $k Must Used At ".AnnoElementType::getDesc($target)."!");
+            DBC::assertTrue(
+                in_array($annoItem->at, $target),
+                "[Gear] Anno $k Must Used At " . AnnoElementType::getDesc($target) . "!"
+            );
         } else {
-            DBC::assertEquals($target, $annoItem->at, "[Gear] Anno $k Must Used At ".AnnoElementType::getDesc($target)."!");
+            DBC::assertEquals(
+                $target,
+                $annoItem->at,
+                "[Gear] Anno $k Must Used At " . AnnoElementType::getDesc($target) . "!"
+            );
         }
         $dependConf = $v instanceof AnnoationCombination ? $v->constDepend() : [];
         $policy = $v->constPolicy();
@@ -182,9 +209,11 @@ class AnnoationStarter implements EzStarter
         //Runtime为必填 才需要检查
         if (AnnoPolicyEnum::POLICY_RUNTIME == $policy) {
             DBC::assertTrue($aspectClass, "[Gear] Anno $k Must Defined Const ASPECT!");
-        } else if (!$aspectClass) {
-            //如果是BuildPolicy，又没定义过Aspect类走空逻辑
-            return null;
+        } else {
+            if (!$aspectClass) {
+                //如果是BuildPolicy，又没定义过Aspect类走空逻辑
+                return null;
+            }
         }
         /**
          * @var $aspect Aspect

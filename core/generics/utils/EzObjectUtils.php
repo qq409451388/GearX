@@ -1,4 +1,7 @@
 <?php
+
+use annotation\AnnoationElement;
+
 class EzObjectUtils
 {
     private function __construct() {}
