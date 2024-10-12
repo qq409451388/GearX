@@ -282,9 +282,10 @@ class EzObjectUtils
         $propertyReflections = $reflectionClass->getProperties();
         $hash = [];
         foreach ($propertyReflections as $propertyReflection) {
-            $annoItem = $propertyReflection->getAnnoation(Clazz::get(JsonProperty::class));
-            if (empty($annoItem) && class_exists(ColumnAlias::class)) {
-                $annoItem = $propertyReflection->getAnnoation(Clazz::get(ColumnAlias::class));
+
+            $annoItem = $propertyReflection->getAnnoation(Clazz::get(Alias::class));
+            if (!empty($annoList)) {
+                $annoItem = current($annoList);
             }
             if ($annoItem instanceof AnnoationElement) {
                 $hash[$annoItem->value] = $propertyReflection->getName();
