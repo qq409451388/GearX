@@ -1,6 +1,6 @@
 <?php
 
-class RunTimeFunction implements EzDataObject
+class RunTimeFunction extends EzObject implements EzDataObject
 {
     /**
      * @var string 匿名函数ID

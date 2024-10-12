@@ -1,9 +1,9 @@
 <?php
 class Env
 {
-    public const PROD = "PROD";
-    public const DEV = "DEV";
-    public const TEST = "TEST";
+    private const PROD = "PROD";
+    private const DEV = "DEV";
+    private const TEST = "TEST";
 
     const OS_LINUX = "LINUX";
     const OS_WINDOWS = "WINDOWS";
@@ -52,7 +52,7 @@ class Env
         if (self::isLinux()) {
             $interface = 'eth0'; // 网卡名称
             $ifconfigInfo = shell_exec('/sbin/ifconfig ' . $interface);
-            if (preg_match('/inet\s+([0-9\.]+)/', $ifconfigInfo, $matches)) {
+            if (preg_match('/inet\s+([0-9.]+)/', $ifconfigInfo, $matches)) {
                 $ipAddress = $matches[1];
             }
         } else if (self::isMac()) {
@@ -60,7 +60,7 @@ class Env
         } else if (self::isWin()) {
             exec("ipconfig", $output);
             foreach ($output as $line) {
-                if (preg_match('/IPv4 Address.*: ([0-9\.]+)/', $line, $matches)) {
+                if (preg_match('/IPv4 Address.*: ([0-9.]+)/', $line, $matches)) {
                     $ipAddress = $matches[1];
                 }
             }
@@ -210,6 +210,7 @@ class Env
             }
             return false;
         }
+        return false;
     }
 
     /**

@@ -3,7 +3,7 @@
 /**
  * 动态代理类运行时，上下文信息
  */
-class RunTimeProcessPoint
+class RunTimeProcessPoint extends EzObject
 {
     /**
      * @var EzReflectionClass

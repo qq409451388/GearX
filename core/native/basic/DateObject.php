@@ -1,5 +1,5 @@
 <?php
-class EzDate extends EzObject
+class DateObject extends EzObject
 {
     private $timeStamp;
 
@@ -11,19 +11,13 @@ class EzDate extends EzObject
     const FORMAT_DATE = 'Y-m-d';
     const FORMAT_TIME = 'H:i:s';
 
-    private static $formatList = [
-        self::FORMAT_DATETIME,
-        self::FORMAT_DATE,
-        self::FORMAT_TIME
-    ];
-
     public function __construct($timeStamp = null)
     {
         $this->timeStamp = is_null($timeStamp) ? time() : $timeStamp;
     }
 
     public static function newFromString($str) {
-        return new EzDate(strtotime($str));
+        return new DateObject(strtotime($str));
     }
 
     public function formatDate($format)

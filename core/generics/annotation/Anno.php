@@ -25,7 +25,8 @@ abstract class Anno
     abstract public static function constStruct();
 
     /**
-     * 非必须，切面逻辑类名，触发此注解时，执行的逻辑 @return Aspect|null
+     * 非必须，切面逻辑类名，触发此注解时，执行的逻辑
+     * @return string the class ? extends Aspect|null
      * @example {@see DiAspect}
      */
     abstract public static function constAspect();

@@ -24,20 +24,30 @@ class EzObjectUtils
         return $str;
     }
 
+
+    /**
+     * 将对象转为可读的字符串
+     * @param $object
+     * @return string
+     */
     public static function toString($obj) {
         if (is_string($obj) || is_numeric($obj)) {
-            return (string)$obj;
+            return strval($obj);
         } else {
             if ($obj instanceof EzDataObject) {
                 if (function_exists("get_mangled_object_vars")) {
-                    return EzCodecUtils::encodeJson(get_mangled_object_vars($obj));
+                    return "[.".get_class($obj).".]".EzCodecUtils::encodeJson(get_mangled_object_vars($obj));
                 } else {
-                    return EzCodecUtils::encodeJson(get_object_vars($obj));
+                    return "[.".get_class($obj).".]".EzCodecUtils::encodeJson(get_object_vars($obj));
                 }
-            } elseif (is_array($obj) || is_object($obj)) {
-                return EzCodecUtils::encodeJson($obj);
+            } elseif (is_array($obj)) {
+                return "[array]".EzCodecUtils::encodeJson($obj);
+            } elseif(is_object($obj)) {
+                return "[.".get_class($obj).".]".EzCodecUtils::encodeJson($obj);
             } elseif (is_resource($obj)) {
                 return "[Resource]#" . ((int)$obj);
+            } elseif (is_bool($obj)) {
+                return $obj ? "[boolean:true]" : "[boolean:false]";
             } else {
                 return "null";
             }
@@ -392,6 +402,9 @@ class EzObjectUtils
         if (empty($obj)) {
             return null;
         }
+        if (is_callable("spl_object_id")) {
+            return spl_object_id($obj);
+        }
         $obj = EzCollectionUtils::ksortFromObject($obj);
         foreach ($obj as $key => $o) {
             if (is_array($o) || is_object($o)) {
@@ -399,5 +412,27 @@ class EzObjectUtils
             }
         }
         return md5(serialize($obj));
+    }
+
+    /**
+     * @example "boolean", "integer", "double", "string", "array", "object", "resource", "NULL", "unknown type", "resource (closed)"
+     * @param $object
+     * @return string
+     */
+    public static function getType($object) {
+        return gettype($object);
+    }
+
+    public static function equals($o1, $o2) {
+        $t1 = self::getType($o1);
+        $t2 = self::getType($o2);
+        if ($t1 != $t2) {
+            return false;
+        }
+        if ($t1 == 'object') {
+            return self::identityCodeForObject($o1) == self::identityCodeForObject($o2);
+        }
+        return $o1 == $o2;
+
     }
 }

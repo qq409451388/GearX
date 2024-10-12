@@ -37,7 +37,7 @@ class Logger
         'light_gray' => '47',
     ];
 
-   public static function console(String $msg){
+   public static function console(string $msg){
         if (Env::isWin()) {
             echo "[".date("Y-m-d H:i:s")."]".$msg.PHP_EOL;
         } else {
@@ -212,9 +212,17 @@ class Logger
     {
         foreach($args as $arg)
         {
-            $template = EzStringUtils::replaceOnce('{}', $arg, $template);
+            $template = self::replaceOnce('{}', $arg, $template);
         }
         return $template;
+    }
+
+    private static function replaceOnce($needle, $replace, $haystack) {
+        $pos = strpos($haystack, $needle);
+        if ($pos === false) {
+            return $haystack;
+        }
+        return substr_replace($haystack, $replace, $pos, strlen($needle));
     }
 
     public static function removeDir($type)

@@ -31,18 +31,18 @@ class EzRpcResponse implements EzDataObject
 
     public function toJson():string{
         if (is_array($this->data) || is_object($this->data)) {
-            $this->format($this->data);
+            $this->format();
         }
-        //$this->data = EzCodecUtils::encodeJson($this->data);
         return EzCodecUtils::encodeJson($this)??self::EMPTY_RESPONSE;
     }
 
-    private function format(&$data) {
+    public function format(&$data = null) {
+        if ($data === null) {
+            $data = $this->data;
+        }
         foreach ($data as $k => &$v) {
-            if ($v instanceof AbstractDO) {
-                $this->format($v);
-            } elseif ($v instanceof EzSerializeDataObject) {
-                $v = Clazz::get($v)->getSerializer()->serialize($v);
+            if ($v instanceof EzSerializeDataObject) {
+                $v = $v->getSerializeObj()->getSerializer()->serialize($v);
             }
         }
     }

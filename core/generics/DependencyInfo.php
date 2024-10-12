@@ -1,5 +1,5 @@
 <?php
-class DependencyInfo implements EzDataObject {
+class DependencyInfo extends EzObject implements EzDataObject {
 
     public $name;
 

@@ -28,7 +28,7 @@ class ConfigVal extends Anno
     }
 
     /**
-     * 非必须，切面逻辑类名，触发此注解时，执行的逻辑 @return Aspect|null
+     * 非必须，切面逻辑类名，触发此注解时，执行的逻辑
      * @example {@see DiAspect}
      */
     public static function constAspect()
