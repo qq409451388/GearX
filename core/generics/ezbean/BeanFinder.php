@@ -21,7 +21,7 @@ class BeanFinder
     }
 
     public function replace($key, $obj){
-        DBC::assertTrue($this->has($key), "[BeanFinder] $key is not exists");
+        DBC::assertTrue($this->has(strtolower($key)), "[BeanFinder] $key is not exists");
         $this->objects[$key] = $obj;
     }
 
@@ -45,7 +45,7 @@ class BeanFinder
         if ($this->has($key)) {
             return $this->pull($key);
         }
-        if (class_exists($key) && is_subclass_of($key, EzBean::class)) {
+        if (class_exists($key)) {
             $this->import($key);
             return $this->pull($key);
         }
@@ -63,7 +63,7 @@ class BeanFinder
 
     public function import($className){
         $clazz =  Clazz::get($className);
-        $this->save($className, $clazz->new());
+        $this->save(strtolower($className), $clazz->new());
         Logger::console("[Bean]Create Object {$className}");
         return $clazz->getName();
     }
