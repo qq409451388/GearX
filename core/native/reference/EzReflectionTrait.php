@@ -1,9 +1,5 @@
 <?php
 
-use annotation\Anno;
-use annotation\AnnoationElement;
-use annotation\AnnoationRule;
-
 trait EzReflectionTrait
 {
     /**

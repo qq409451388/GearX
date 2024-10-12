@@ -1,15 +1,5 @@
 <?php
 
-namespace anno\di;
-
-use annotation\Aspect;
-use annotation\BuildAspect;
-use BeanFinder;
-use Config;
-use DBC;
-use DynamicProxy;
-use GearShutDownException;
-
 /**
  * 依赖注入切面
  */

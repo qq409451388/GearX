@@ -1,9 +1,5 @@
 <?php
 
-namespace annotation\annoconst;
-
-use EzCheckUtils;
-
 class AnnoElementType
 {
     public const TYPE = 1;

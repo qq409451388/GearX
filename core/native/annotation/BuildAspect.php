@@ -1,7 +1,5 @@
 <?php
 
-namespace annotation;
-
 interface BuildAspect
 {
     public function check(): bool;

@@ -1,7 +1,5 @@
 <?php
 
-namespace annotation;
-
 /**
  * 需要被组合使用的注解
  */

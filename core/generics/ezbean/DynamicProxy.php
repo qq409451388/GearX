@@ -1,8 +1,5 @@
 <?php
 
-use annotation\RunTimeFunction;
-use annotation\RunTimeProcessPoint;
-
 /**
  * 动态代理类
  * @description 依赖 __call方法实现代理逻辑，本对象内的方法名以 “__call__” 开头确保业务方法名一定不存在

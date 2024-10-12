@@ -1,18 +1,5 @@
 <?php
 
-namespace annotation;
-
-use annotation\annoconst\AnnoElementType;
-use annotation\annoconst\AnnoPolicyEnum;
-use Application;
-use BeanFinder;
-use DBC;
-use DynamicProxy;
-use EzCheckUtils;
-use EzReflectionClass;
-use EzReflectionProperty;
-use EzStarter;
-
 class AnnoationStarter implements EzStarter
 {
 

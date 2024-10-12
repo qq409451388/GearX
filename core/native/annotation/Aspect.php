@@ -1,13 +1,5 @@
 <?php
 
-namespace annotation;
-
-use BeanFinder;
-use DynamicProxy;
-use EzReflectionClass;
-use EzReflectionMethod;
-use EzReflectionProperty;
-
 abstract class Aspect
 {
     private $annoName;

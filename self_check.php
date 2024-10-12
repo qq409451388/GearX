@@ -1,5 +1,4 @@
 <?php
-
 function checkDependencies($directory, $rules) {
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
     foreach ($iterator as $file) {

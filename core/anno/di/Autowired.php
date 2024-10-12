@@ -1,12 +1,5 @@
 <?php
 
-namespace anno\di;
-
-use annotation\Anno;
-use annotation\annoconst\AnnoElementType;
-use annotation\annoconst\AnnoPolicyEnum;
-use annotation\annoconst\AnnoValueTypeEnum;
-
 class Autowired extends Anno
 {
     public function getClassName()

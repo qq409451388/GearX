@@ -1,9 +1,5 @@
 <?php
 
-namespace annotation;
-
-use annotation\annoconst\AnnoElementType;
-
 class AnnoationElement
 {
     public $annoName;

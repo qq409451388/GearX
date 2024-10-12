@@ -1,10 +1,5 @@
 <?php
 
-use annotation\Anno;
-use annotation\annoconst\AnnoElementType;
-use annotation\annoconst\AnnoPolicyEnum;
-use annotation\annoconst\AnnoValueTypeEnum;
-
 class JsonProperty extends Anno
 {
     public function getColumn() {

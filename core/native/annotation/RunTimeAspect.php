@@ -1,7 +1,5 @@
 <?php
 
-namespace annotation;
-
 interface RunTimeAspect
 {
     public function check(): bool;

@@ -1,7 +1,5 @@
 <?php
 
-use anno\di\Resource;
-
 class EzBeanUtils
 {
     /**

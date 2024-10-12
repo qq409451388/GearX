@@ -1,9 +1,5 @@
 <?php
 
-namespace annotation;
-
-use EzDataObject;
-
 class RunTimeFunction implements EzDataObject
 {
     /**

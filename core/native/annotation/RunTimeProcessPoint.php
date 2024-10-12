@@ -1,10 +1,5 @@
 <?php
 
-namespace annotation;
-
-use EzReflectionClass;
-use EzString;
-
 /**
  * 动态代理类运行时，上下文信息
  */

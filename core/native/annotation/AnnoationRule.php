@@ -1,20 +1,5 @@
 <?php
 
-namespace annotation;
-
-use annotation\annoconst\AnnoElementType;
-use annotation\annoconst\AnnoValueTypeEnum;
-use Clazz;
-use DBC;
-use EzCheckUtils;
-use EzCodecUtils;
-use EzHelper;
-use EzReflectionClass;
-use EzReflectionMethod;
-use EzReflectionProperty;
-use EzStringUtils;
-use Logger;
-
 class AnnoationRule implements EzHelper
 {
     private function __construct() {}

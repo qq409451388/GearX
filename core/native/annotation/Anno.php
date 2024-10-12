@@ -1,13 +1,5 @@
 <?php
 
-namespace annotation;
-
-use anno\di\DiAspect;
-use annotation\annoconst\AnnoElementType;
-use annotation\annoconst\AnnoPolicyEnum;
-use annotation\annoconst\AnnoValueTypeEnum;
-use Logger;
-
 /**
  * 注解
  */
