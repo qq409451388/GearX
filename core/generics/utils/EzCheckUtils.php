@@ -148,4 +148,52 @@ class EzCheckUtils
         $expectTrans = self::$dataTypeMap[$expect] ?? null;
         return $actualTrans === $expectTrans;
     }
+
+    /**
+     * 判断传入的版本号是否符合要求
+     * @param string $actual 实际的版本号 1.0.0
+     * @param string $expect 版本号开闭集合 [1.0.0, 2.0.0) 或 [1.0.0, 2.0.0]
+     * @return bool
+     */
+    public static function versionCheck($actual, $expect): bool {
+        // 去掉空格
+        $expect = trim($expect);
+
+        $pattern = '/(>=|<=|>|<)/';
+        // 存储匹配结果的数组
+        $matches = [];
+        // 使用 preg_match_all 查找所有匹配的比较符号
+        preg_match($pattern, $expect, $matches);
+        $matches = array_unique($matches);
+        if (1 == count($matches)) {
+            $left = current($matches);
+            if (in_array($left, ['<', '>', '<=', '>='])) {
+                return version_compare($actual, str_replace($left, "", $expect), $left);
+            } else {
+                DBC::throwEx("Invalid version range format.");
+            }
+        } else {
+            $expectVersionArr = explode(',', substr($expect, 1, -1));
+            $expectVersionArr = array_map('trim', $expectVersionArr);
+            DBC::assertEquals(2, count($expectVersionArr), "Invalid version range format.");
+            $left = $expect[0];
+            $right = $expect[strlen($expect)-1];
+            $compareLeft = $compareRight = true;
+            if ($left == '[') {
+                $compareLeft = version_compare($actual, $expectVersionArr[0], ">=");
+            } elseif ($left == '(') {
+                $compareLeft = version_compare($actual, $expectVersionArr[0], ">");
+            } else {
+                DBC::throwEx("Invalid version range format.");
+            }
+            if ($right == ']') {
+                $compareRight = version_compare($actual, $expectVersionArr[1], "<=");
+            } elseif ($right == ')') {
+                $compareRight = version_compare($actual, $expectVersionArr[1], "<");
+            } else {
+                DBC::throwEx("Invalid version range format.");
+            }
+            return $compareLeft && $compareRight;
+        }
+    }
 }

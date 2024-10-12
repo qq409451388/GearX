@@ -1,0 +1,5 @@
+native 不依赖任何其他包的自定义类，仅语言层面的代码
+annoation 关于注解的基础实现，不包含任何可被使用的注解逻辑，可以且仅可以依赖core下的其他自定义类
+generice 可以依赖native下面的自定义类
+
+php 7.1+ passed

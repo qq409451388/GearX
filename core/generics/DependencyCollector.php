@@ -38,6 +38,9 @@ class DependencyCollector {
          */
         $moduleInfoArr = EzCodecUtils::decodeJson($json);
         $moduleInfo = EzObjectUtils::create($moduleInfoArr, DependencyInfo::class);
+        DBC::assertTrue($moduleInfo->phpVersionCheck(), "[Dependency] php version check fail! module:".$moduleInfo->name
+            , 999, GearShutDownException::class);
+        DBC::assertEmpty(SysUtils::extensionLoaded($moduleInfo->phpExtensions), "[Dependency] php extension check fail! module:".$moduleInfo->name);
         return EzObjectUtils::getFromObject($moduleInfo, "dependencies");
     }
 

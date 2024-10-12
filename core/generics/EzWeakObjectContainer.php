@@ -13,7 +13,7 @@ class EzWeakObjectContainer extends EzObject implements EzDataObject
         if (is_null($target)) {
             return false;
         }
-        return spl_object_id($this->obj) === spl_object_id($target);
+        return EzObjectUtils::equals($this->obj, $target);
     }
 
     public function __construct($obj, $aliveTimeSeconds = 6, $refreshLogic = null) {
