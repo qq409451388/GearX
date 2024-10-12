@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * used for @see EzObjectUtils::createNormalObject()
+ */
 class JsonProperty extends Anno
 {
     public function getColumn() {

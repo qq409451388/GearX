@@ -154,4 +154,16 @@ class DynamicProxy
     private function clearContextInstance() {
         $this->contextInstance = [];
     }
+
+    public function refreshObj($obj) {
+        $this->obj = $obj;
+    }
+
+    public function __get($key){
+        return $this->obj->$key;
+    }
+
+    public function __set($key, $value) {
+        $this->obj->$key = $value;
+    }
 }

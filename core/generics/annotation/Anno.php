@@ -68,4 +68,12 @@ abstract class Anno
         Logger::error("[Anno] no get data for key {}", $name);
         return null;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 }

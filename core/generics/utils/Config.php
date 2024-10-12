@@ -73,11 +73,11 @@ class Config
                 $applicationConfig[$key] = $pj;
                 continue;
             }
+            $content = file_get_contents($pj);
             if(!empty($content) && $decodedObj = EzCodecUtils::decodeJson($content)){
                 self::setFromFile($key, $decodedObj);
             }
         }
-        //DBC::assertNotEmpty($applicationConfig, "[Config] The application config not founded.");
         self::processApplicationConfig($applicationConfig);
     }
 
