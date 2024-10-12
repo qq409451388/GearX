@@ -67,47 +67,59 @@ class Config
         $applicationConfig = [];
         foreach ($pjs as $key => $pj) {
             if (!is_file($pj)) {
-                return null;
+                continue;
             }
             if ((new EzString($key))->startsWith("application")) {
                 $applicationConfig[$key] = $pj;
                 continue;
             }
-            $content = file_get_contents($pj);
             if(!empty($content) && $decodedObj = EzCodecUtils::decodeJson($content)){
                 self::setFromFile($key, $decodedObj);
             }
         }
+        //DBC::assertNotEmpty($applicationConfig, "[Config] The application config not founded.");
+        self::processApplicationConfig($applicationConfig);
+    }
 
-        if (!empty($applicationConfig)) {
-            // refresh application
-            $env = null;
-            $applicationConfigObject = [];
-            if (isset($applicationConfig['application'])) {
-                $json = file_get_contents($applicationConfig['application']);
-                $applicationConfigObject = EzCodecUtils::decodeJson($json);
-                $env = $applicationConfigObject['env'];
-            }
-            if (defined("ENV")) {
-                $env = ENV;
-            }
-            if (!empty(Application::getContext()->getEnv())) {
-                $env = Application::getContext()->getEnv();
-            }
-            DBC::assertNotEmpty($env, "[Config] The Env must be specified at Config File application.");
-            $applicationInstanceKey = "application.$env";
-            if (isset($applicationConfig[$applicationInstanceKey])) {
-                $json = file_get_contents($applicationConfig[$applicationInstanceKey]);
-                $tmp = EzCodecUtils::decodeJson($json);
-                foreach ($tmp as $key => $value) {
-                    $applicationConfigObject[$key] = $value;
-                }
-            } else {
-                Logger::warn("[Config] The env was set to {}, but no application.{} configuration was found, using the default configuration instead.", $env, $env);
-            }
-            self::setFromFile('application', $applicationConfigObject);
+    /**
+     * @param array<string, string> $applicationConfig array the applicationKey => application json file path
+     * @throws Exception
+     */
+    private static function processApplicationConfig($applicationConfig) {
+        if (empty($applicationConfig)) {
+            return;
         }
+        $applicationConfigObject = [];
+        // 1. init from application.json
+        if (isset($applicationConfig['application'])) {
+            $json = file_get_contents($applicationConfig['application']);
+            $applicationConfigObject = EzCodecUtils::decodeJson($json);
+        }
+        $env = self::determineEnvironment($applicationConfigObject);
+        // refresh application from application.{$env}.json
+        $applicationInstanceKey = "application.$env";
+        if (isset($applicationConfig[$applicationInstanceKey])) {
+            $json = file_get_contents($applicationConfig[$applicationInstanceKey]);
+            $tmp = EzCodecUtils::decodeJson($json);
+            foreach ($tmp as $key => $value) {
+                $applicationConfigObject[$key] = $value;
+            }
+        } else {
+            Logger::warn("[Config] The env was set to {}, but no application.{} configuration was found, using the default configuration instead.", $env, $env);
+        }
+        self::setFromFile('application', $applicationConfigObject);
+    }
 
+    /**
+     * Priority of retrieving environment variables: Startup arguments > Launcher definitions > Application configuration
+     * @throws Exception
+     */
+    private static function determineEnvironment($applicationConfigObject) {
+        $env = $applicationConfigObject['env'] ?? null;
+        $env = defined("ENV") ? ENV : $env;
+        $env = Application::getContext()->getEnv() ?? $env;
+        DBC::assertNotEmpty($env, "[Config] The Env must be specified in the Config File application.");
+        return $env;
     }
 
     private static function setFromFile($key, $data) {

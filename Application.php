@@ -62,7 +62,7 @@ class Application
 
             if (!is_dir($v)) {
                 if (!self::isPlainFolderName($v)) {
-                    exit("The $k <$v> is not a folder name!");
+                    exit("The $k <$v> is not a valid folder name!");
                 }
                 // treat the project path as the root path.
                 if (self::isWin()) {
@@ -250,7 +250,7 @@ class Application
      * 获取系统家族名称
      * @return string
      */
-    public static function getSimlpeOs() {
+    public static function getSimpleOs() {
         if (defined("PHP_OS_FAMILY")) {
             switch (PHP_OS_FAMILY) {
                 case "Windows":
@@ -293,11 +293,11 @@ class Application
     }
 
     public static function isWin() {
-        return self::OS_WINDOWS === self::getSimlpeOs();
+        return self::OS_WINDOWS === self::getSimpleOs();
     }
 
     public static function isLinux() {
-        return self::OS_LINUX === self::getSimlpeOs();
+        return self::OS_LINUX === self::getSimpleOs();
     }
 
     public static function isUnix() {
@@ -305,7 +305,7 @@ class Application
     }
 
     public static function isMac() {
-        return self::OS_MAC === self::getSimlpeOs();
+        return self::OS_MAC === self::getSimpleOs();
     }
 
     private function register($hash) {
