@@ -191,6 +191,10 @@ class Application
             if (is_subclass_of($className, EzBean::class)) {
                 $this->createBean($className);
             }
+
+            if (is_subclass_of($className, EzSingleton::class)) {
+                BeanFinder::get()->importLite($className);
+            }
         }
         Application::$context->setGlobalComponentClass($classes);
     }
@@ -320,7 +324,7 @@ class Application
     /**
      * 自动注册继承自BaseController的公共函数的路由
      * 路径规则：类名/方法名
-     * @deprecated
+     * @deprecated 因为设计的依赖关系，Application不应依赖web modules，本方法废弃
      * @return void
      * @throws ReflectionException
      */
@@ -368,7 +372,7 @@ class Application
                 return;
             }
             BeanFinder::get()->save($class, $bean);
-            Logger::console("[Gear]Create Bean {$class}");
+            Logger::info("[Gear]Create Bean {$class}");
         } catch (Exception $e) {
             DBC::throwEx("[Gear]Create Bean Exception {$e->getMessage()}", 0, GearShutDownException::class);
         }

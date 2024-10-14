@@ -3,7 +3,7 @@
 /**
  * 注解
  */
-abstract class Anno
+abstract class Anno implements EzSingleton
 {
     protected $value;
 
@@ -12,24 +12,17 @@ abstract class Anno
     /**
      * 指定注解可以放置的位置（默认: 所有）@see AnnoElementType
      */
-    abstract public static function constTarget();
+    abstract public function constTarget();
 
     /**
      * 指定注解的执行模式 @see AnnoPolicyEnum
      */
-    abstract public static function constPolicy();
+    abstract public function constPolicy();
 
     /**
      * 指定注解的value设置规则 @see AnnoValueTypeEnum
      */
-    abstract public static function constStruct();
-
-    /**
-     * 非必须，切面逻辑类名，触发此注解时，执行的逻辑
-     * @return string the class ? extends Aspect|null
-     * @example {@see DiAspect}
-     */
-    abstract public static function constAspect();
+    abstract public function constStruct();
 
     /**
      * 将传入的字符串或map格式的数组赋值到注解对象中

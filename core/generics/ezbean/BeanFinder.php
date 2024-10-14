@@ -26,6 +26,10 @@ class BeanFinder
     }
 
     public function save($key, $obj){
+        if (is_null($obj)) {
+            Logger::warn("[BeanFinder] save $key is null");
+            return;
+        }
         $key = strtolower($key);
         if($this->has($key)){
             Logger::warn("[BeanFinder] $key is exists!");
@@ -62,19 +66,17 @@ class BeanFinder
     }
 
     public function import($className){
-        $clazz =  Clazz::get($className);
-        $this->save(strtolower($className), $clazz->new());
-        Logger::console("[Bean]Create Object {$className}");
-        return $clazz->getName();
+        //$clazz =  Clazz::get($className);
+        $this->save(strtolower($className), EzBeanUtils::createBean($className, false));
+        Logger::info("[Bean] Create DynamicObject {$className}");
     }
 
-    /**
-     * 分析引用类，生成EzTree
-     * todo
-     * @return void
-     */
-    public function analyseClasses() {
-        $this->tree = new EzTree();
-        $classes = Config::get("GLOBAL_CORE_CLASS");
+    public function importLite($className) {
+        $ref = new EzReflectionClass($className);
+        if ($ref->isInterface() || $ref->isAbstract()) {
+            return;
+        }
+        $this->save(strtolower($className), new $className());
+        Logger::info("[Bean] Create NormalObject {$className}");
     }
 }

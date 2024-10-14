@@ -1,6 +1,6 @@
 <?php
 
-class AnnoationRule implements EzHelper
+class AnnoationRule implements EzSingleton
 {
     private function __construct() {}
 
@@ -12,8 +12,8 @@ class AnnoationRule implements EzHelper
      */
     public static function searchAnnoation($reflection, Clazz $annoName)
     {
-        $valueType = $annoName->callStatic("constStruct");
-        $at = $annoName->callStatic("constTarget");
+        $valueType = $annoName->call("constStruct");
+        $at = $annoName->call("constTarget");
         $refTarget = self::getRefTarget($reflection);
         if (EzCheckUtils::isArray($at)) {
             DBC::assertTrue(in_array($refTarget, $at), "[AnnoationRule] Unsupport positon!");

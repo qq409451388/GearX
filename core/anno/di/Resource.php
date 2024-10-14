@@ -4,29 +4,24 @@
  * 将对象注入到类属性中
  * 要求：待注入的类应为EzBean对象
  */
-class Resource extends Anno
+class Resource extends BuildAnnotation
 {
     public function getClassName()
     {
         return $this->value;
     }
 
-    public static function constTarget()
+    public function constTarget()
     {
         return AnnoElementType::TYPE_FIELD;
     }
 
-    public static function constPolicy()
-    {
-        return AnnoPolicyEnum::POLICY_BUILD;
-    }
-
-    public static function constStruct()
+    public function constStruct()
     {
         return AnnoValueTypeEnum::TYPE_NORMAL;
     }
 
-    public static function constAspect()
+    public function constAspect()
     {
         return DiAspect::class;
     }

@@ -116,6 +116,9 @@ class AnnoationStarter implements EzStarter
              * @var DynamicProxy $obj
              */
             $reflection = $obj->__CALL__getReflectionClass();
+            if ($reflection->isSubclassOf(EzSingleton::class)) {
+                continue;
+            }
             /**
              * class 和 method或property 有关联的情况，将classAspect收集起来
              * 调用fetchAnnoForDepend再次处理
@@ -192,26 +195,21 @@ class AnnoationStarter implements EzStarter
         $dependConf = $v instanceof AnnoationCombination ? $v->constDepend() : [];
         $policy = $v->constPolicy();
         DBC::assertNotEmpty($policy, "[Gear] Anno $k Must Defined Const POLICY!");
-        $aspectClass = $v->constAspect();
-        //Runtime为必填 才需要检查
-        if (AnnoPolicyEnum::POLICY_RUNTIME == $policy) {
-            DBC::assertTrue($aspectClass, "[Gear] Anno $k Must Defined Const ASPECT!");
-        } else {
-            if (!$aspectClass) {
-                //如果是BuildPolicy，又没定义过Aspect类走空逻辑
-                return null;
-            }
+        if (AnnoPolicyEnum::POLICY_BUILD == $policy) {
+            $aspectClass = $v->constAspect();
+            DBC::assertNonNull($aspectClass, "[Gear] Anno $k Must Defined Const ASPECT!");
+            /**
+             * @var $aspect Aspect
+             */
+            $aspect = new $aspectClass;
+            $aspect->setAnnoName($k);
+            $aspect->setValue($v);
+            $aspect->setIsCombination(is_subclass_of($v, AnnoationCombination::class));
+            $aspect->setTarget($target);
+            $aspect->setDependConf($dependConf);
+            return $aspect;
         }
-        /**
-         * @var $aspect Aspect
-         */
-        $aspect = new $aspectClass;
-        $aspect->setAnnoName($k);
-        $aspect->setValue($v);
-        $aspect->setIsCombination(is_subclass_of($v, AnnoationCombination::class));
-        $aspect->setTarget($target);
-        $aspect->setDependConf($dependConf);
-        return $aspect;
+        return null;
     }
 
 }

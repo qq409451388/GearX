@@ -22,7 +22,10 @@ class Clazz
 
     public function callStatic($method, $args = []) {
         return call_user_func_array([$this->className,$method], $args);
-        //return $this->className::$method(...$args);
+    }
+
+    public function call($method, $args = []) {
+        return call_user_func_array([$this->new(),$method], $args);
     }
 
     public function getConst($constName) {
