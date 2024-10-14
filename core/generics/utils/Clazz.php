@@ -45,7 +45,7 @@ class Clazz
      * @return Deserializer
      */
     public function getDeserializer() {
-        if (class_exists($this->className."Deserializer")) {
+        if (class_exists($this->className. "Deserializer")) {
             return Clazz::get($this->className."Deserializer")->new();
         }
         return null;
