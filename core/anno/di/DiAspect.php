@@ -16,9 +16,16 @@ class DiAspect extends Aspect implements BuildAspect
         if (Resource::class == $this->getAnnoName()) {
             $className = $this->getValue()->className;
             $object = BeanFinder::get()->pull($className);
-            DBC::assertTrue(
+            // todo 不确定这个关闭会有什么影响
+            /*DBC::assertTrue(
                 $object instanceof DynamicProxy,
                 "[DiAspect] 待注入对象{$className}必须为DynamicProxy实例!",
+                0,
+                GearShutDownException::class
+            );*/
+            DBC::assertNonNull(
+                $object,
+                "[DiAspect] 待注入对象{$className}为null!",
                 0,
                 GearShutDownException::class
             );
