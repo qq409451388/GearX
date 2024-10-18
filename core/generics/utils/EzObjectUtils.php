@@ -222,7 +222,7 @@ class EzObjectUtils
             try {
                 $key = $propertyAlias[$key] ?? $key;
                 $refProperty = $refClass->getProperty($key);
-            }catch (ReflectionException $reflectionException) {
+            }catch (Exception $reflectionException) {
                 $refProperty = null;
                 Logger::warn("[EzObjectUtils] getProperty Fail! from Class:{}, key:{}", $className, $key);
             }

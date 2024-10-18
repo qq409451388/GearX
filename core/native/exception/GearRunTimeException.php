@@ -3,6 +3,6 @@
 /**
  * 运行时异常
  */
-class GearRunTimeException extends \RuntimeException{
+class GearRunTimeException extends RuntimeException {
 
 }

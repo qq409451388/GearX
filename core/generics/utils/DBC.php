@@ -17,6 +17,7 @@ class DBC
         if (Env::isScript()) {
             $type = GearShutDownException::class;
         }
+        Logger::exception($msg);
         throw new $type($msg, $code);
     }
 
