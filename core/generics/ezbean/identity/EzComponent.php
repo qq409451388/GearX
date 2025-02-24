@@ -7,5 +7,9 @@
  */
 interface EzComponent
 {
+    public function loadPlugin(EzPlugin $plugin);
 
+    public function callbackPluginStart();
+
+    public function callbackPluginEnd();
 }
